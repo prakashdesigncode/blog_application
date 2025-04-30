@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { selectedIsAuthenticate } from "../Redux/Dashboard_Redux/selector";
 import { useNavigate } from "react-router-dom";
-import {
-  useInputHook,
-  useSelectedValue,
-  useBooleanHook,
-} from "../Hooks/customHooks";
+import { useInputHook, useBooleanHook } from "../Hooks/customHooks";
 import {
   handleCreatinal,
   handleLocalStorage,
@@ -16,7 +11,7 @@ import { Map } from "immutable";
 const LoginCompound = () => {
   const [isUserStay, handleUserStay] = useBooleanHook(false);
   const [error, setError] = useState(Map());
-  const [isAuthenticate] = useSelectedValue(selectedIsAuthenticate);
+
   const inputRef = useRef({ username: "", password: "" });
   const navigate = useNavigate();
 
