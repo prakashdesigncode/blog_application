@@ -11,10 +11,11 @@ export function handleLocalStorage() {
   return { username, password };
 }
 
-export function handleCreatinal(inputs) {
+export function handleCreatinal(inputs, handleUserStay) {
   const { username, password } = inputs.current;
   localStorage.setItem("username", username);
   localStorage.setItem("password", password);
+  handleUserStay(true);
 }
 
 export function handleLogout() {

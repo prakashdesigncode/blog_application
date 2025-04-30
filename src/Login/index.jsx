@@ -26,14 +26,18 @@ const LoginCompound = () => {
       name: username,
       secrectKey: password,
     });
+
     if (username.length <= 0)
       setError((prev) => prev.set("username", "Enter User Name"));
     if (password.length <= 0)
       setError((prev) => prev.set("password", "Enter Password"));
     else if (password.length < 4)
       setError((prev) => prev.set("password", "Password Minimum 4 Characters"));
-    else handleCreatinal(inputRef);
-    if (isValidate === Boolean) if (isValidate) navigate("/dashboard");
+    else if (!isUserStay) handleCreatinal(inputRef, handleUserStay);
+
+    if (typeof isValidate === "boolean" && isUserStay) {
+      if (isValidate) return navigate("/dashboard/photos");
+    }
   };
 
   useEffect(() => {
