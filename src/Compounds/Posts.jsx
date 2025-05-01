@@ -1,29 +1,49 @@
 import React from "react";
-import { selectedPosts } from "../Redux/Dashboard_Redux/selector";
+import {
+  selectedIsLoading,
+  selectedPosts,
+} from "../Redux/Dashboard_Redux/selector";
 import { fetchPostData } from "../Redux/Dashboard_Redux/tunk";
-import { useInfinateScroll } from "../Hooks/customHooks";
+import { useInfinateScroll, useSelectedValue } from "../Hooks/customHooks";
+import SkeletonPosts from "./SkeletonPosts";
+
+/*-------------------Util Start--------------------*/
+const staticColors = [
+  "border-t-amber-300",
+  "border-t-sky-300",
+  "border-t-red-300",
+  "border-t-green-300",
+];
+/*-------------------Util Start--------------------*/
 
 const Posts = () => {
   const [infinate, isInterSecting] = useInfinateScroll(
     selectedPosts,
     fetchPostData
   );
+  const [isLoading] = useSelectedValue(selectedIsLoading);
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-      {infinate.map((value, index) => (
-        <div
-          ref={infinate.size - 1 === index ? isInterSecting : null}
-          key={index}
-          style={{
-            width: "200px",
-            height: "100px",
-            border: "2px solid red",
-            padding: "10px",
-          }}
-        >
-          {value.get("title", "")}
-        </div>
-      ))}
+    <div className="flex flex-wrap gap-10">
+      {isLoading ? (
+        <SkeletonPosts />
+      ) : (
+        infinate.map((value, index) => (
+          <div
+            ref={infinate.size - 1 === index ? isInterSecting : null}
+            key={index}
+            className={`h-64 w-96 bg-white rounded border-t-6 p-3 px-5 shadow-md grid grid-rows-[1fr_auto] ${
+              staticColors[index % staticColors.length]
+            }`}
+          >
+            <div className="text-2xl font-bold text-gray-600">
+              {value.get("title", "")}
+            </div>
+            <div className="text-1xl text-gray-500 font-bold">
+              {value.get("body", "")}
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 };

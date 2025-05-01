@@ -1,0 +1,23 @@
+.overflow-scroll {
+  height: 97%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.scroll-desgin::-webkit-scrollbar {
+  width: 12px;
+  margin: 40px 0;
+}
+
+.scroll-desgin::-webkit-scrollbar-track {
+  margin: 40px 0;
+}
+
+.scroll-desgin::-webkit-scrollbar-thumb {
+  background-color: rgb(167, 162, 162);
+  border-radius: 20px;
+}
+
+.vertical-align {
+  writing-mode: vertical-lr;
+}
