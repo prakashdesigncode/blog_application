@@ -112,7 +112,7 @@ export const useFormValidation = (handleUserStay) => {
       } else if (value.length < 4) {
         handleBoolean(`${fields[index]} Minimum 4 Characters`);
         valid = false;
-      } else if (isCheck >= 0 && index === 0 && type !== "signin") {
+      } else if (isCheck >= 0 && index === 0 && type === "signup") {
         handleBoolean(`Already ${fields[index]} Exits`);
         valid = false;
       }

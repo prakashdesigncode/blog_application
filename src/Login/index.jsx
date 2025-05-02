@@ -5,6 +5,7 @@ import {
   useFormValidation,
 } from "../Hooks/customHooks";
 import { TextField } from "@mui/material";
+import { Map } from "immutable";
 
 /*--------------------Utils Start------------------------*/
 const inputSx = {
@@ -94,12 +95,15 @@ const LoginCompound = () => {
           />
         </div>
         {error.get("common", "") && (
-          <div className="font-bold mt-2 text-red-600">
+          <div className="font-bold mb-2 text-red-600">
             {error.get("common", "")}
           </div>
         )}
         <div>
-          <LoginCompound.Button click={handleForm} error={error}>
+          <LoginCompound.Button
+            click={handleForm(isUserStay ? "signin" : "signup")}
+            error={error}
+          >
             {isUserStay ? "Sign In" : "Sign Up"}
           </LoginCompound.Button>
         </div>
@@ -123,6 +127,7 @@ LoginCompound.Input = ({ ref, type, error, setError, isUserStay }) => {
 
   useEffect(() => {
     handleChange({ target: { value: "" } });
+    setError(Map());
   }, [isUserStay]);
   return (
     <div className="my-8">
@@ -154,7 +159,7 @@ LoginCompound.Button = ({ children, click, error, isUserStay }) => {
   return (
     <button
       className="bg-blue-950 w-full py-3 text-white font-bold rounded"
-      onClick={() => click(isUserStay ? "signup" : "signin")(error.size)}
+      onClick={() => click(error.size)}
     >
       {children}
     </button>
