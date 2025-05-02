@@ -133,7 +133,7 @@ export const useAuthLogin = (inputRef, handleUserStay) => {
   const handleAuthSignIn = (setError) => {
     const { username, password } = inputRef.current;
     const key = `${username}+${password}`;
-    const previousUsers = JSON.parse(localStorage.getItem("users")) || {};
+    const previousUsers = JSON.parse(localStorage.getItem("users")) || false;
     const findUser = previousUsers[key];
     if (findUser) {
       localStorage.setItem("currentUser", JSON.stringify(findUser));
