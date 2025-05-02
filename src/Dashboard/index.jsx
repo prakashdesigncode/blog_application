@@ -2,6 +2,8 @@ import { Divider } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Outlet, useSearchParams, useNavigate } from "react-router-dom";
 import { handleLogout } from "../Utils/customfunctions";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 
 /*--------------------Utils Start-------------------------*/
 const navigators = [
@@ -14,6 +16,9 @@ const navigators = [
 const DashboardCompound = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   const navigate = useNavigate();
 
   const handleNavigation = (index, path) => {
@@ -29,9 +34,9 @@ const DashboardCompound = () => {
   }, []);
 
   return (
-    <div className="bg-neutral-300 w-full h-dvh grid grid-cols-[minmax(60px,6%)_1fr]">
-      <div className=" flex flex-col items-center">
-        <div className="my-20">
+    <div className="bg-neutral-300 w-full [overflow:hidden] h-dvh sm:grid sm:grid-cols-[minmax(60px,5%)_1fr]">
+      <div className=" flex sm:flex-col px-5   items-center">
+        <div className="sm:my-20 my-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -46,14 +51,20 @@ const DashboardCompound = () => {
             <path d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .625.627 5.243 5.243 0 0 0 5.022-2.051.75.75 0 1 0-1.202-.897 3.744 3.744 0 0 1-3.008 1.51c0-1.23.592-2.323 1.51-3.008Z" />
           </svg>
         </div>
-        <div className="grow flex my-3">
-          <Divider orientation="vertical" flexItem />
+        <div className="grow sm:flex my-3">
+          <Divider
+            orientation={isSmallScreen ? "horizontal" : "vertical"}
+            flexItem
+          />
         </div>
-        <div className="vertical-align  font-bold">BLOGGER</div>
-        <div className="grow flex my-3">
-          <Divider orientation="vertical" flexItem />
+        <div className=" sm:[writing-mode:vertical-lr] font-bold">BLOGGER</div>
+        <div className="grow sm:flex  my-3">
+          <Divider
+            orientation={isSmallScreen ? "horizontal" : "vertical"}
+            flexItem
+          />
         </div>
-        <div className="my-20">
+        <div className="sm:my-20 my-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -69,7 +80,7 @@ const DashboardCompound = () => {
           </svg>
         </div>
       </div>
-      <div className="bg-stone-100 flex flex-col gap-6 sm:gap-10 px-4 sm:px-10 rounded-[6vw] sm:rounded-[2.5vw] mr-2 sm:mr-4 mt-4 mb-4 scroll-design overflow-scroll">
+      <div className="bg-stone-100 flex flex-col gap-6 sm:gap-10 px-4 mx-3 sm:mx-0 sm:px-10 rounded-[6vw] sm:rounded-[2.5vw] mr-2 sm:mr-4 mt-4 mb-4 scroll-design overflow-scroll">
         <div className="bg-stone-100 pt-8 sm:pt-12">
           <h3 className="text-black font-extrabold text-2xl sm:text-4xl">
             collections
