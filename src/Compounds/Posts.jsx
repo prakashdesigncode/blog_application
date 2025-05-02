@@ -31,7 +31,7 @@ const Posts = () => {
           <div
             ref={infinite.size - 1 === index ? isInterSecting : null}
             key={index}
-            className={`h-64 w-96 bg-white rounded border-t-6 p-3 px-5 shadow-md grid grid-rows-[1fr_auto] ${
+            className={`h-64 w-96 bg-white grow-1 rounded border-t-6 p-3 px-5 shadow-md grid grid-rows-[1fr_auto] ${
               staticColors[index % staticColors.length]
             }`}
           >

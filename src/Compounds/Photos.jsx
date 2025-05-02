@@ -28,7 +28,7 @@ const Photos = () => {
             key={index}
           >
             <img
-              className={`h-64 w-96 object-cover rounded-3xl ${
+              className={`object-cover rounded-3xl ${
                 imageLoading.get(index, true) ? "hidden" : "block"
               }`}
               src={defaultImage}

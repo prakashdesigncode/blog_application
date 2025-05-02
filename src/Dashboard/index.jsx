@@ -29,7 +29,7 @@ const DashboardCompound = () => {
   }, []);
 
   return (
-    <div className="bg-neutral-300 w-full h-dvh grid grid-cols-[6%_1fr]">
+    <div className="bg-neutral-300 w-full h-dvh grid grid-cols-[minmax(60px,6%)_1fr]">
       <div className=" flex flex-col items-center">
         <div className="my-20">
           <svg
@@ -69,20 +69,23 @@ const DashboardCompound = () => {
           </svg>
         </div>
       </div>
-      <div className="bg-stone-100  flex flex-col gap-10 px-10  rounded-[2.5vw] mr-4 mt-4 mb-4 scroll-design overflow-scroll">
-        <div className=" bg-stone-100 pt-12">
-          <h3 className="text-black font-extrabold text-4xl">collections</h3>
-          <h5 className="text-gray-500 font-bold text-1xl">
+      <div className="bg-stone-100 flex flex-col gap-6 sm:gap-10 px-4 sm:px-10 rounded-[6vw] sm:rounded-[2.5vw] mr-2 sm:mr-4 mt-4 mb-4 scroll-design overflow-scroll">
+        <div className="bg-stone-100 pt-8 sm:pt-12">
+          <h3 className="text-black font-extrabold text-2xl sm:text-4xl">
+            collections
+          </h3>
+          <h5 className="text-gray-500 font-bold text-sm sm:text-xl">
             personalized content storyboards
           </h5>
         </div>
-        <div className="flex py-7 gap-3 sticky top-0  bg-stone-100">
-          <div className="border-dashed border-2 border-neutral-300 p-4 rounded-full">
+
+        <div className="flex flex-wrap items-center py-5 sm:py-7 gap-2 sm:gap-3 sticky top-0 bg-stone-100 z-10">
+          <div className="border-dashed border-2 border-neutral-300 p-3 sm:p-4 rounded-full">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="size-6"
+              className="w-5 h-5 sm:w-6 sm:h-6"
             >
               <path
                 fillRule="evenodd"
@@ -91,21 +94,19 @@ const DashboardCompound = () => {
               />
             </svg>
           </div>
-          {navigators.map((menu, index) => {
-            return (
-              <div
-                key={index}
-                onClick={() => handleNavigation(index, menu.path)}
-                className={`border-2 font-bold hover:border-rose-600 cursor-pointer border-neutral-300 ${
-                  currentPage === menu.key
-                    ? "bg-rose-600 text-white border-rose-600"
-                    : "text-black"
-                }   p-4 px-7 rounded-full`}
-              >
-                {menu.name}
-              </div>
-            );
-          })}
+          {navigators.map((menu, index) => (
+            <div
+              key={index}
+              onClick={() => handleNavigation(index, menu.path)}
+              className={`border-2 font-bold text-sm sm:text-base hover:border-rose-600 cursor-pointer border-neutral-300 ${
+                currentPage === menu.key
+                  ? "bg-rose-600 text-white border-rose-600"
+                  : "text-black"
+              } p-2 px-5 sm:p-4 sm:px-7 rounded-full`}
+            >
+              {menu.name}
+            </div>
+          ))}
         </div>
         <div>
           <Outlet />
