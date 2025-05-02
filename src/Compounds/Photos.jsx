@@ -42,7 +42,7 @@ const Photos = () => {
               >
                 <svg
                   aria-hidden="true"
-                  class="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-pink-600"
+                  className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-pink-600"
                   viewBox="0 0 100 101"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -56,7 +56,7 @@ const Photos = () => {
                     fill="currentFill"
                   />
                 </svg>
-                <span class="sr-only">Loading...</span>
+                <span className="sr-only">Loading...</span>
               </div>
             )}
             <div className="text-gray-800 font-bold text-1xl mx-3 self-start">

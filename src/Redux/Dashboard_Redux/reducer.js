@@ -16,7 +16,12 @@ const initialState = fromJS({ isAuthenticate: false });
 export const dashboardReducer = createSlice({
   name: "dashboard",
   initialState,
-  reducers: {},
+  reducers: {
+    setData(state, action) {
+      state = state.merge(action.payload);
+      return state;
+    },
+  },
   extraReducers: (builder) => {
     /*---Posts Start---*/
     builder.addCase(fetchPhotosData.pending, pendingCallBack);
@@ -31,5 +36,5 @@ export const dashboardReducer = createSlice({
     /*---Photos End-----*/
   },
 });
-
+export const { setData } = dashboardReducer.actions;
 export default dashboardReducer.reducer;
