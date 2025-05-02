@@ -12,9 +12,14 @@ import "./style.css";
 import Home from "./Compounds/Home";
 
 const CheckRedirect = ({ children }) => {
-  const { username, password } = handleLocalStorage();
-  return username && password ? (
-    <Navigate to="/dashboard/photos" replace />
+  const isHere = handleLocalStorage();
+  return isHere ? children : <Navigate to="/" replace />;
+};
+
+const CheckLoginRedirect = ({ children }) => {
+  const isHere = handleLocalStorage();
+  return isHere ? (
+    <Navigate to="/home/dashboard?current=0" replace />
   ) : (
     children
   );
@@ -26,16 +31,44 @@ createRoot(document.getElementById("root")).render(
       <Routes>
         <Route
           element={
-            <CheckRedirect>
+            <CheckLoginRedirect>
               <LoginCompound />
+            </CheckLoginRedirect>
+          }
+          path="/"
+        />
+        <Route
+          element={
+            <CheckRedirect>
+              <DashboardCompound />
             </CheckRedirect>
           }
-          path="/login"
-        />
-        <Route element={<DashboardCompound />} path="/">
-          <Route element={<Home />} path="home" />
-          <Route element={<Posts />} path="posts" />
-          <Route element={<Photos />} path="photos" />
+          path="/home"
+        >
+          <Route
+            element={
+              <CheckRedirect>
+                <Home />
+              </CheckRedirect>
+            }
+            path="dashboard"
+          />
+          <Route
+            element={
+              <CheckRedirect>
+                <Posts />
+              </CheckRedirect>
+            }
+            path="posts"
+          />
+          <Route
+            element={
+              <CheckRedirect>
+                <Photos />
+              </CheckRedirect>
+            }
+            path="photos"
+          />
         </Route>
       </Routes>
     </BrowserRouter>

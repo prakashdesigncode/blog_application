@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fromJS, Map } from "immutable";
+import { fromJS } from "immutable";
 import {
   pendingCallBack,
   errorCallBack,
@@ -7,7 +7,7 @@ import {
   successCallBackPosts,
 } from "./utils";
 
-import { fetchPhotosData, fetchPostData } from "./tunk";
+import { fetchPhotosData, fetchPostData } from "./thunk";
 
 /*----------------------Static Utils------------------------*/
 const initialState = fromJS({ isAuthenticate: false });

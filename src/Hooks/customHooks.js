@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { List } from "immutable";
+import { List, Map } from "immutable";
+import { useNavigate } from "react-router-dom";
+
+/*------------------------Utils Start--------------------------*/
+const validation = [undefined, null, ""];
+const initialize = { username: "", password: "" };
+/*------------------------Utils End----------------------------*/
 
 /* 
  @params : param1 : Number || String 
@@ -58,7 +64,7 @@ export const useSelectedValue = (selector) => {
  @params : param1 : function , param2 : function
  @return : [array,function]
 */
-export const useInfinateScroll = (selector, action) => {
+export const useInfiniteScroll = (selector, action) => {
   const [state, setState] = useState(List([]));
   const [page, setPage] = useState(1);
   const ref = useRef(null);
@@ -74,4 +80,73 @@ export const useInfinateScroll = (selector, action) => {
     if (data.size) setState(data.splice(page * 10));
   }, [page, data]);
   return [state, isInterSecting];
+};
+
+export const useFormValidation = (handleUserStay) => {
+  const [error, setError] = useState(Map());
+  const inputRef = useRef(initialize);
+
+  const [handleAuthSignIn, handleAuthSignUp] = useAuthLogin(
+    inputRef,
+    handleUserStay
+  );
+
+  const handleError = (value) => (message) => {
+    setError((prev) => prev.set(value, message));
+  };
+  const handleForm = (type) => (size) => {
+    let valid = true;
+    const { username, password } = inputRef.current;
+    [username, password].forEach((value, index) => {
+      const previousUsers = JSON.parse(localStorage.getItem("users")) || {};
+      const objectKeys = Object.keys(previousUsers);
+      const fields = ["username", "password"];
+      const isCheck = objectKeys.findIndex((element) => {
+        const spited = element.split("+");
+        return spited[0] === value;
+      });
+      const handleBoolean = handleError(fields[index]);
+      if (validation.includes(value)) {
+        handleBoolean(`Enter ${fields[index]}`);
+        valid = false;
+      } else if (value.length < 4) {
+        handleBoolean(`${fields[index]} Minimum 4 Characters`);
+        valid = false;
+      } else if (isCheck >= 0 && index === 0 && type !== "signin") {
+        handleBoolean(`Already ${fields[index]} Exits`);
+        valid = false;
+      }
+    });
+    if (valid) {
+      if (type === "signin") {
+        return handleAuthSignIn(setError);
+      } else {
+        return handleAuthSignUp();
+      }
+    }
+  };
+  return [handleForm, error, setError, inputRef];
+};
+
+export const useAuthLogin = (inputRef, handleUserStay) => {
+  const navigate = useNavigate();
+  const handleAuthSignIn = (setError) => {
+    const { username, password } = inputRef.current;
+    const key = `${username}+${password}`;
+    const previousUsers = JSON.parse(localStorage.getItem("users")) || {};
+    const findUser = previousUsers[key];
+    if (findUser) {
+      localStorage.setItem("currentUser", JSON.stringify(findUser));
+      navigate("/home?current=0");
+    } else setError((prev) => prev.set("common", "User not found"));
+  };
+  const handleAuthSignUp = () => {
+    const { username, password } = inputRef.current;
+    const key = `${username}+${password}`;
+    const previousUsers = JSON.parse(localStorage.getItem("users")) || {};
+    previousUsers[key] = { username, password };
+    localStorage.setItem("users", JSON.stringify(previousUsers));
+    handleUserStay(true);
+  };
+  return [handleAuthSignIn, handleAuthSignUp];
 };

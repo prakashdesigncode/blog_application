@@ -1,23 +1,9 @@
-export function operationLocalStorage({ name = "", secrectKey }) {
-  const { username, password } = handleLocalStorage();
-  if (name.trim() !== username) return "UserName InCorrect";
-  if (secrectKey !== password) return "PassWord InCorrect";
-  return name.trim() === username && secrectKey === password;
-}
-
 export function handleLocalStorage() {
-  const username = localStorage.getItem("username") || null;
-  const password = localStorage.getItem("password") || null;
-  return { username, password };
+  const isHere = JSON.parse(localStorage.getItem("currentUser")) || null;
+  if (isHere) return true;
 }
 
-export function handleCreatinal(inputs, handleUserStay) {
-  const { username, password } = inputs.current;
-  localStorage.setItem("username", username);
-  localStorage.setItem("password", password);
-  handleUserStay(true);
-}
-
-export function handleLogout() {
-  localStorage.clear();
+export function handleLogout(navigate) {
+  localStorage.removeItem("currentUser");
+  navigate("/");
 }

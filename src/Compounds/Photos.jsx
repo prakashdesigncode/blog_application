@@ -1,15 +1,15 @@
 import React from "react";
-import { fetchPhotosData } from "../Redux/Dashboard_Redux/tunk";
+import { fetchPhotosData } from "../Redux/Dashboard_Redux/thunk";
 import {
   selectedIsLoading,
   selectedPhotos,
 } from "../Redux/Dashboard_Redux/selector";
-import { useInfinateScroll, useSelectedValue } from "../Hooks/customHooks";
+import { useInfiniteScroll, useSelectedValue } from "../Hooks/customHooks";
 import defaultImage from "../assets/defaut.png";
 import Skeleton from "./SkeletonPhotos";
 
 const Photos = () => {
-  const [infinate, isInterSecting] = useInfinateScroll(
+  const [infinite, isInterSecting] = useInfiniteScroll(
     selectedPhotos,
     fetchPhotosData
   );
@@ -19,10 +19,10 @@ const Photos = () => {
       {isLoading ? (
         <Skeleton />
       ) : (
-        infinate.map((value, index) => (
+        infinite.map((value, index) => (
           <div
             className="flex flex-col gap-4 grow-1  w-86 "
-            ref={infinate.size - 1 === index ? isInterSecting : null}
+            ref={infinite.size - 1 === index ? isInterSecting : null}
             key={index}
           >
             <img

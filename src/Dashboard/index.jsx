@@ -4,8 +4,8 @@ import { Outlet, useSearchParams, useNavigate } from "react-router-dom";
 import { handleLogout } from "../Utils/customfunctions";
 
 /*--------------------Utils Start-------------------------*/
-const navigations = [
-  { name: "Home", key: 0, path: "home" },
+const navigators = [
+  { name: "Home", key: 0, path: "dashboard" },
   { name: "Posts", key: 1, path: "posts" },
   { name: "Photos", key: 2, path: "photos" },
 ];
@@ -25,7 +25,7 @@ const DashboardCompound = () => {
   useEffect(() => {
     const pageNo = searchParams.get("current") || 0;
     setCurrentPage(Number(pageNo));
-    navigate(`${navigations[pageNo].path}?current=${pageNo}`);
+    navigate(`${navigators[pageNo].path}?current=${pageNo}`);
   }, []);
 
   return (
@@ -59,7 +59,7 @@ const DashboardCompound = () => {
             viewBox="0 0 24 24"
             fill="currentColor"
             className="size-8 logout"
-            onClick={handleLogout}
+            onClick={() => handleLogout(navigate)}
           >
             <path
               fillRule="evenodd"
@@ -69,7 +69,7 @@ const DashboardCompound = () => {
           </svg>
         </div>
       </div>
-      <div className="bg-stone-100  flex flex-col gap-10 px-10  rounded-[2.5vw] mr-4 mt-4 mb-4 scroll-desgin overflow-scroll">
+      <div className="bg-stone-100  flex flex-col gap-10 px-10  rounded-[2.5vw] mr-4 mt-4 mb-4 scroll-design overflow-scroll">
         <div className=" bg-stone-100 pt-12">
           <h3 className="text-black font-extrabold text-4xl">collections</h3>
           <h5 className="text-gray-500 font-bold text-1xl">
@@ -91,7 +91,7 @@ const DashboardCompound = () => {
               />
             </svg>
           </div>
-          {navigations.map((menu, index) => {
+          {navigators.map((menu, index) => {
             return (
               <div
                 key={index}

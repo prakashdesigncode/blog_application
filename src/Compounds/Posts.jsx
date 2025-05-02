@@ -3,8 +3,8 @@ import {
   selectedIsLoading,
   selectedPosts,
 } from "../Redux/Dashboard_Redux/selector";
-import { fetchPostData } from "../Redux/Dashboard_Redux/tunk";
-import { useInfinateScroll, useSelectedValue } from "../Hooks/customHooks";
+import { fetchPostData } from "../Redux/Dashboard_Redux/thunk";
+import { useInfiniteScroll, useSelectedValue } from "../Hooks/customHooks";
 import SkeletonPosts from "./SkeletonPosts";
 
 /*-------------------Util Start--------------------*/
@@ -17,7 +17,7 @@ const staticColors = [
 /*-------------------Util Start--------------------*/
 
 const Posts = () => {
-  const [infinate, isInterSecting] = useInfinateScroll(
+  const [infinite, isInterSecting] = useInfiniteScroll(
     selectedPosts,
     fetchPostData
   );
@@ -27,9 +27,9 @@ const Posts = () => {
       {isLoading ? (
         <SkeletonPosts />
       ) : (
-        infinate.map((value, index) => (
+        infinite.map((value, index) => (
           <div
-            ref={infinate.size - 1 === index ? isInterSecting : null}
+            ref={infinite.size - 1 === index ? isInterSecting : null}
             key={index}
             className={`h-64 w-96 bg-white rounded border-t-6 p-3 px-5 shadow-md grid grid-rows-[1fr_auto] ${
               staticColors[index % staticColors.length]
