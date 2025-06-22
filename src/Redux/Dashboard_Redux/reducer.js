@@ -3,11 +3,13 @@ import { fromJS } from "immutable";
 import {
   pendingCallBack,
   errorCallBack,
-  successCallBackPhotos,
-  successCallBackPosts,
+  successCallBackLogin,
+  successCallBackRegister,
+  successGetUserPhotos,
+  successGetSingedUrl,
 } from "./utils";
 
-import { fetchPhotosData, fetchPostData } from "./thunk";
+import { authLogin, authRegister, fetchPhotos, getSingedUrl } from "./thunk";
 
 /*----------------------Static Utils------------------------*/
 const initialState = fromJS({ isAuthenticate: false });
@@ -23,17 +25,29 @@ export const dashboardReducer = createSlice({
     },
   },
   extraReducers: (builder) => {
-    /*---Posts Start---*/
-    builder.addCase(fetchPhotosData.pending, pendingCallBack);
-    builder.addCase(fetchPhotosData.fulfilled, successCallBackPhotos);
-    builder.addCase(fetchPhotosData.rejected, errorCallBack);
-    /*---Posts End----*/
+    /*---Auth Login Start---*/
+    builder.addCase(authLogin.pending, pendingCallBack);
+    builder.addCase(authLogin.fulfilled, successCallBackLogin);
+    builder.addCase(authLogin.rejected, errorCallBack);
+    /*---Auth Login End----*/
 
-    /*---Photos Start---*/
-    builder.addCase(fetchPostData.pending, pendingCallBack);
-    builder.addCase(fetchPostData.fulfilled, successCallBackPosts);
-    builder.addCase(fetchPostData.rejected, errorCallBack);
-    /*---Photos End-----*/
+    /*---Auth Register Start---*/
+    builder.addCase(authRegister.pending, pendingCallBack);
+    builder.addCase(authRegister.fulfilled, successCallBackRegister);
+    builder.addCase(authRegister.rejected, errorCallBack);
+    /*---Auth Register End-----*/
+
+    /*---Auth Register Start---*/
+    builder.addCase(fetchPhotos.pending, pendingCallBack);
+    builder.addCase(fetchPhotos.fulfilled, successGetUserPhotos);
+    builder.addCase(fetchPhotos.rejected, errorCallBack);
+    /*---Auth Register End-----*/
+
+    /*---SignedUrl Start---*/
+    builder.addCase(getSingedUrl.pending, pendingCallBack);
+    builder.addCase(getSingedUrl.fulfilled, successGetSingedUrl);
+    builder.addCase(getSingedUrl.rejected, errorCallBack);
+    /*---SignedUrl End-----*/
   },
 });
 export const { setData } = dashboardReducer.actions;

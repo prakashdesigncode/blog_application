@@ -1,71 +1,132 @@
-import React, { useState } from "react";
-import { fetchPhotosData } from "../Redux/Dashboard_Redux/thunk";
+import React, { useEffect, useState } from "react";
+import { fetchPhotos } from "../Redux/Dashboard_Redux/thunk";
 import {
   selectedIsLoading,
   selectedPhotos,
+  selectedCreation,
 } from "../Redux/Dashboard_Redux/selector";
-import { useInfiniteScroll, useSelectedValue } from "../Hooks/customHooks";
+import {
+  useCallDispatch,
+  useInfiniteScroll,
+  useSelectedValue,
+} from "../Hooks/customHooks";
 import defaultImage from "../assets/defaut.png";
+import moment from "moment/moment";
 import Skeleton from "./SkeletonPhotos";
-import { Map } from "immutable";
+import { fromJS, List, Map } from "immutable";
+import { ShowSinglePhoto } from "../Utils/designUtils";
+import * as jwt_decode from "jwt-decode";
+import { Checkbox } from "@mui/material";
+import { useSearchParams } from "react-router-dom";
+import { setData } from "../Redux/Dashboard_Redux/reducer";
+import { useSelector } from "react-redux";
 
 const Photos = () => {
+  const decode = jwt_decode.jwtDecode(localStorage.getItem("token"));
+  const [setRedux] = useCallDispatch(setData);
+  const [creation, setCreation] = useState(Map({}));
   const [infinite, isInterSecting] = useInfiniteScroll(
     selectedPhotos,
-    fetchPhotosData
+    fetchPhotos,
+    decode.sub
   );
+  const [open, setOpen] = useState(Map({ open: false, key: "" }));
+  const handleClickOpen = (key, _id) =>
+    setOpen((prev) =>
+      prev
+        .set("key", key)
+        .set("open", true)
+        .set("_id", _id)
+        .set("userId", decode.sub)
+    );
+  const handleClose = () => setOpen((prev) => prev.set("open", false));
   const [imageLoading, setImageLoading] = useState(Map());
   const [isLoading] = useSelectedValue(selectedIsLoading);
+  const [searchParams] = useSearchParams();
+
+  const handleAlbum = (event, id) => {
+    const { checked } = event.target;
+    setCreation((prev) => {
+      if (checked) prev = prev.set(id, id);
+      else prev = prev.delete(id);
+      return prev;
+    });
+  };
+
+  useEffect(() => {
+    setRedux(fromJS({ creation }));
+  }, [creation]);
+
   return (
-    <div className="flex flex-wrap gap-10">
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        infinite.map((value, index) => (
-          <div
-            className="flex flex-col gap-4 grow-1  w-86 "
-            ref={infinite.size - 1 === index ? isInterSecting : null}
-            key={index}
-          >
-            <img
-              className={`object-cover rounded-3xl ${
-                imageLoading.get(index, true) ? "hidden" : "block"
-              }`}
-              src={defaultImage}
-              alt={defaultImage}
-              onLoad={() => setImageLoading((prev) => prev.set(index, false))}
-            />
-            {imageLoading.get(index, true) && (
-              <div
-                role="status"
-                className="h-64 w-96 flex justify-center items-center bg-neutral-200 rounded-2xl"
-              >
-                <svg
-                  aria-hidden="true"
-                  className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-pink-600"
-                  viewBox="0 0 100 101"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                    fill="currentFill"
-                  />
-                </svg>
-                <span className="sr-only">Loading...</span>
+    <>
+      <ShowSinglePhoto handleClose={handleClose} open={open} />
+      <div className="flex flex-wrap gap-20 h-[100%] mt-8 ">
+        {isLoading ? (
+          <Skeleton />
+        ) : (
+          <>
+            {infinite.size === 0 ? (
+              <div className="flex justify-center items-center w-full flex-col gap-4">
+                <img src="https://www.gstatic.com/social/photosui/images/state/empty_state_photos_646x328dp.svg" />
+                <div className="text-2xl mx-10 text-white">
+                  Ready to add some photos?
+                </div>
               </div>
+            ) : (
+              infinite.map((value, index) => (
+                <div
+                  className="flex flex-col gap-4   w-86 "
+                  ref={infinite.size - 1 === index ? isInterSecting : null}
+                  key={index}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="text-neutral-300 font-bold text-1xl mt-2 mx-3 self-start">
+                      {moment(value.get("createdAt", "")).format(
+                        "ddd, MMM D, YYYY"
+                      )}
+                    </div>
+                    {searchParams.get("creation") && (
+                      <Checkbox
+                        disableRipple
+                        sx={{ color: "grey" }}
+                        checked={creation.has(value.get("_id", ""))}
+                        onClick={(event) =>
+                          handleAlbum(event, value.get("_id", ""))
+                        }
+                      />
+                    )}
+                  </div>
+                  <img
+                    onClick={() =>
+                      handleClickOpen(
+                        value.get("key", ""),
+                        value.get("_id", "")
+                      )
+                    }
+                    className={` h-60 w-90 object-cover rounded ${
+                      imageLoading.get(index, true) ? "hidden" : "block"
+                    }`}
+                    src={value.get("thumbnailUrl", defaultImage)}
+                    alt={defaultImage}
+                    onLoad={() =>
+                      setImageLoading((prev) => prev.set(index, false))
+                    }
+                  />
+                  {imageLoading.get(index, true) && (
+                    <div
+                      key={index}
+                      className=" animate-pulse w-93 gap-4 flex justify-center flex-col max-w-sm rounded-md   p-4"
+                    >
+                      <div className="h-55 w-80 rounded-3xl bg-neutral-300"></div>
+                    </div>
+                  )}
+                </div>
+              ))
             )}
-            <div className="text-gray-800 font-bold text-1xl mx-3 self-start">
-              {index + 1} . {value.get("title", "")}
-            </div>
-          </div>
-        ))
-      )}
-    </div>
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

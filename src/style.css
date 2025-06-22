@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+.user-input {
+  border-radius: 20px;
+  background-color: #282a2c;
+  input {
+    padding: 12px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    outline: none;
+    border: none;
+    color: white;
+  }
+}

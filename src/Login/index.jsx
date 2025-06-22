@@ -28,6 +28,17 @@ const LoginCompound = () => {
     <div className="w-full h-dvh flex items-center justify-center ">
       <div className="w-[31rem] px-5 py-1">
         <div className=" mb-10">
+          <div className="text-center mb-4">
+            <span className="font-bold text-4xl">
+              <span className="text-sky-500">G</span>
+              <span className="text-red-500">o</span>
+              <span className="text-yellow-500">o</span>
+              <span className="text-sky-500">g</span>
+              <span className="text-green-500">l</span>
+              <span className="text-red-500">e</span>
+            </span>
+            <span className="text-2xl mx-2">Photos</span>
+          </div>
           <div className="text-[18px] font-bold ">
             Sign {isUserStay ? "in" : "up"} to your account
           </div>
@@ -54,31 +65,9 @@ const LoginCompound = () => {
           )}
         </div>
 
-        {!isUserStay && (
-          <div className="rounded flex  gap-3.5 bg-cyan-200 px-4 py-3 text-blue-950">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="size-6 text-sky-400"
-            >
-              <path
-                fillRule="evenodd"
-                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <div>
-              Create like <span className="text-blue-950 font-bold">ram</span>{" "}
-              with password{" "}
-              <span className="text-blue-950 font-bold">1234@R</span>
-            </div>
-          </div>
-        )}
-
         <div>
           <LoginCompound.Input
-            type="username"
+            type="Email"
             ref={inputRef}
             error={error}
             setError={setError}
@@ -87,7 +76,7 @@ const LoginCompound = () => {
         </div>
         <div>
           <LoginCompound.Input
-            type="password"
+            type="Password"
             ref={inputRef}
             error={error}
             setError={setError}
@@ -115,20 +104,14 @@ const LoginCompound = () => {
 LoginCompound.Input = ({ ref, type, error, setError, isUserStay }) => {
   const [state, handleChange] = useInputHook();
   useEffect(() => {
-    if (state) {
-      ref.current[type] = state.trim();
-      setError((prev) =>
-        state.length < 4
-          ? prev.set(type, `${type} Minimum 4 Characters`)
-          : prev.delete(type)
-      );
-    }
+    if (state) ref.current[type.toLowerCase()] = state.trim();
   }, [state]);
 
   useEffect(() => {
     handleChange({ target: { value: "" } });
     setError(Map());
   }, [isUserStay]);
+
   return (
     <div className="my-8">
       <TextField
@@ -146,7 +129,9 @@ LoginCompound.Input = ({ ref, type, error, setError, isUserStay }) => {
         sx={inputSx}
         onChange={handleChange}
       />
-      <div className="font-bold mt-2 text-red-600">{error.get(type, "")}</div>
+      <div className="font-bold mt-2 text-red-600">
+        {error.get(type.toLowerCase(), "")}
+      </div>
     </div>
   );
 };
@@ -155,11 +140,11 @@ LoginCompound.Label = ({ children }) => {
   return <label>{children}</label>;
 };
 
-LoginCompound.Button = ({ children, click, error, isUserStay }) => {
+LoginCompound.Button = ({ children, click }) => {
   return (
     <button
-      className="bg-blue-950 w-full py-3 text-white font-bold rounded"
-      onClick={() => click(error.size)}
+      className="bg-sky-600 w-full py-3 text-white font-bold rounded"
+      onClick={() => click()}
     >
       {children}
     </button>

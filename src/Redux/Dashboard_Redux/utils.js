@@ -10,19 +10,37 @@ const errorCallBack = (state, action) => {
   return state;
 };
 
-const successCallBackPosts = (state, action) => {
-  state = state.set("posts", fromJS(action.payload)).set("isLoading", false);
+const successCallBackLogin = (state, action) => {
+  localStorage.setItem("token", action.payload.access_token);
+  state = state
+    .set("userCredentials", fromJS(action.payload.user))
+    .set("isLoading", false);
   return state;
 };
 
-const successCallBackPhotos = (state, action) => {
-  state = state.set("photos", fromJS(action.payload)).set("isLoading", false);
+const successCallBackRegister = (state, action) => {
+  state = state.set("message", fromJS(action.payload)).set("isLoading", false);
+  return state;
+};
+
+const successGetUserPhotos = (state, action) => {
+  state = state
+    .set("userPhotos", fromJS(action.payload))
+    .set("isLoading", false);
+  return state;
+};
+
+const successGetSingedUrl = (state, action) => {
+  console.log(action.payload, 34, action);
+  state = state.set("isLoading", false);
   return state;
 };
 
 export {
   pendingCallBack,
   errorCallBack,
-  successCallBackPhotos,
-  successCallBackPosts,
+  successCallBackLogin,
+  successCallBackRegister,
+  successGetUserPhotos,
+  successGetSingedUrl,
 };
