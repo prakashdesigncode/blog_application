@@ -11,7 +11,6 @@ const errorCallBack = (state, action) => {
 };
 
 const successCallBackLogin = (state, action) => {
-  localStorage.setItem("token", action.payload.access_token);
   state = state
     .set("userCredentials", fromJS(action.payload.user))
     .set("isLoading", false);
@@ -30,7 +29,7 @@ const successGetUserPhotos = (state, action) => {
   return state;
 };
 
-const successGetSingedUrl = (state, action) => {
+const successGetSingedUrl = (state) => {
   state = state.set("isLoading", false);
   return state;
 };

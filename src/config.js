@@ -1,3 +1,1 @@
-export const Base_Url =
-  import.meta.env.VITE_APP_API_BASE_URL ||
-  "https://jsonplaceholder.typicode.com";
+export const Base_Url = import.meta.env.VITE_APP_API_BASE_URL;

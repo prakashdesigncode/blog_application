@@ -2,21 +2,27 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Base_Url } from "../../config";
 import axios from "axios";
 
-const token = localStorage.getItem("token");
-
 const authLogin = createAsyncThunk("auth/login", async (payload) => {
-  const response = await axios.post(Base_Url + "auth/login", payload);
+  const { value, callBack } = payload;
+  const response = await axios.post(Base_Url + "auth/login", value);
+  response.status === 201 &&
+    localStorage.setItem("token", response?.data.access_token);
+  response.status === 201 && callBack();
   return response?.data;
 });
 
 const authRegister = createAsyncThunk("auth/register", async (payload) => {
-  const response = await axios.post(Base_Url + "auth/register", payload);
+  const { value, callBack } = payload;
+  const response = await axios.post(Base_Url + "auth/register", value);
+  response.status === 201 && callBack();
   return response?.data;
 });
 
-const fetchPhotos = createAsyncThunk("photos/fetchPhotos", async (userId) => {
+const fetchPhotos = createAsyncThunk("photos/fetchPhotos", async (payload) => {
+  const token = localStorage.getItem("token");
+  const { userId, searchText = "" } = payload;
   const response = await axios.get(Base_Url + "photos", {
-    params: { userId },
+    params: { userId, ...(searchText && { searchText }) },
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -25,6 +31,7 @@ const fetchPhotos = createAsyncThunk("photos/fetchPhotos", async (userId) => {
 });
 
 const uploadPhoto = createAsyncThunk("photos/uploadPhoto", async (payload) => {
+  const token = localStorage.getItem("token");
   const { callBack, formData } = payload;
   const response = await axios.post(Base_Url + "photos", formData, {
     headers: {
@@ -37,6 +44,7 @@ const uploadPhoto = createAsyncThunk("photos/uploadPhoto", async (payload) => {
 });
 
 const createAlbums = createAsyncThunk("albums/createAlbums", async (data) => {
+  const token = localStorage.getItem("token");
   const { callBack, payload } = data;
   const response = await axios.post(Base_Url + "albums", payload, {
     headers: {
@@ -48,6 +56,7 @@ const createAlbums = createAsyncThunk("albums/createAlbums", async (data) => {
 });
 
 const fetchAlbums = createAsyncThunk("albums/fetchAlbums", async (userId) => {
+  const token = localStorage.getItem("token");
   const response = await axios.get(Base_Url + "albums", {
     params: { userId },
     headers: {
@@ -60,6 +69,7 @@ const fetchAlbums = createAsyncThunk("albums/fetchAlbums", async (userId) => {
 const getSingedUrl = createAsyncThunk(
   "photos/getSingedUrl",
   async (payload) => {
+    const token = localStorage.getItem("token");
     const { key, callBack } = payload;
     const response = await axios.get(Base_Url + "s3", {
       params: { url: key },
@@ -75,6 +85,7 @@ const getSingedUrl = createAsyncThunk(
 const deleteSinglePhoto = createAsyncThunk(
   "photos/deleteSinglePhoto",
   async (payload) => {
+    const token = localStorage.getItem("token");
     const { _id, userId, callBack } = payload;
     const response = await axios.delete(Base_Url + "photos", {
       params: { id: _id, userId },
@@ -90,6 +101,7 @@ const deleteSinglePhoto = createAsyncThunk(
 const getAlbumPhotos = createAsyncThunk(
   "albums/getAlbumPhotos",
   async (payload) => {
+    const token = localStorage.getItem("token");
     const { ids, callBack } = payload;
     const response = await axios.post(
       Base_Url + "photos/albumPhotos",

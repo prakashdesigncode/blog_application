@@ -19,7 +19,7 @@ import {
 } from "./thunk";
 
 /*----------------------Static Utils------------------------*/
-const initialState = fromJS({ isAuthenticate: false });
+export const initialState = fromJS({ isAuthenticate: false });
 /*----------------------Static Utils------------------------*/
 
 export const dashboardReducer = createSlice({

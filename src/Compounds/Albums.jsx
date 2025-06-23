@@ -12,10 +12,7 @@ import { CreateAlbumDialog, ShowSinglePhoto } from "../Utils/designUtils";
 import * as jwtDecode from "jwt-decode";
 
 const Albums = () => {
-  const [infinite, isInterSecting] = useInfiniteScroll(
-    selectedAlbums,
-    fetchAlbums
-  );
+  const [infinite, _] = useInfiniteScroll(selectedAlbums, fetchAlbums);
   const [imageLoading, setImageLoading] = useState(Map({}));
   const [isLoading] = useSelectedValue(selectedIsLoading);
   const [openImage, setOpenImage] = useState(Map({ open: false, key: "" }));
@@ -33,7 +30,11 @@ const Albums = () => {
     setOpenImage((prev) => prev.set("open", false));
   return (
     <div className="flex flex-wrap gap-10">
-      <ShowSinglePhoto handleClose={handleCloseImage} open={openImage} />
+      <ShowSinglePhoto
+        handleClose={handleCloseImage}
+        open={openImage}
+        isAlbum={true}
+      />
       {isLoading ? (
         <SkeletonPhotos />
       ) : (

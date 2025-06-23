@@ -3,7 +3,6 @@ import { fetchPhotos } from "../Redux/Dashboard_Redux/thunk";
 import {
   selectedIsLoading,
   selectedPhotos,
-  selectedCreation,
 } from "../Redux/Dashboard_Redux/selector";
 import {
   useCallDispatch,
@@ -19,7 +18,6 @@ import * as jwt_decode from "jwt-decode";
 import { Checkbox } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 import { setData } from "../Redux/Dashboard_Redux/reducer";
-import { useSelector } from "react-redux";
 
 const Photos = () => {
   const decode = jwt_decode.jwtDecode(localStorage.getItem("token"));
@@ -28,7 +26,7 @@ const Photos = () => {
   const [infinite, isInterSecting] = useInfiniteScroll(
     selectedPhotos,
     fetchPhotos,
-    decode.sub
+    { userId: decode.sub }
   );
   const [open, setOpen] = useState(Map({ open: false, key: "" }));
   const handleClickOpen = (key, _id) =>
@@ -66,7 +64,7 @@ const Photos = () => {
         ) : (
           <>
             {infinite.size === 0 ? (
-              <div className="flex justify-center items-center w-full flex-col gap-4">
+              <div className="flex justify-center h-[80vh] items-center w-full flex-col gap-4">
                 <img src="https://www.gstatic.com/social/photosui/images/state/empty_state_photos_646x328dp.svg" />
                 <div className="text-2xl mx-10 text-white">
                   Ready to add some photos?

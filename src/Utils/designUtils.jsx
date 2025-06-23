@@ -1,4 +1,4 @@
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from "react";
 import Popover from "@mui/material/Popover";
 import {
@@ -22,7 +22,7 @@ import {
   getSingedUrl,
   uploadPhoto,
 } from "../Redux/Dashboard_Redux/thunk";
-import { Map, List, fromJS, set } from "immutable";
+import { Map, List, fromJS } from "immutable";
 import * as jwtDecode from "jwt-decode";
 import moment from "moment";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -37,7 +37,7 @@ export const AddPhotoPopover = ({ children }) => {
   const [getPhotos] = useCallDispatch(fetchPhotos);
   const callBack = () => {
     handleClose();
-    getPhotos(decode.sub);
+    getPhotos({ userId: decode.sub });
   };
   const handleFileInput = (event) => {
     const formData = new FormData();
@@ -250,7 +250,7 @@ export const CreateAlbumDialog = ({
   );
 };
 
-export const ShowSinglePhoto = ({ handleClose, open }) => {
+export const ShowSinglePhoto = ({ handleClose, open, isAlbum = false }) => {
   const [imageLoading, setImageLoading] = useState(Map({ isLoading: true }));
   const [signedUrl] = useCallDispatch(getSingedUrl);
   const callBack = (url) => setImageLoading((prev) => prev.set("url", url));
@@ -271,17 +271,19 @@ export const ShowSinglePhoto = ({ handleClose, open }) => {
               size={25}
               onClick={handleClose}
             />
-            <MdDeleteOutline
-              className="text-white cursor-pointer"
-              size={25}
-              onClick={() =>
-                deleteImage({
-                  _id: open.get("_id", ""),
-                  callBack: handleClose,
-                  userId: open.get("userId", ""),
-                })
-              }
-            />
+            {!isAlbum && (
+              <MdDeleteOutline
+                className="text-white cursor-pointer"
+                size={25}
+                onClick={() =>
+                  deleteImage({
+                    _id: open.get("_id", ""),
+                    callBack: handleClose,
+                    userId: open.get("userId", ""),
+                  })
+                }
+              />
+            )}
           </div>
           <div className="px-10 bg-">
             <img

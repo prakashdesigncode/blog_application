@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { List, Map } from "immutable";
+import { fromJS, List, Map } from "immutable";
 import { useNavigate } from "react-router-dom";
 import { authLogin, authRegister } from "../Redux/Dashboard_Redux/thunk";
 
 /*------------------------Utils Start--------------------------*/
-const validation = [undefined, null, ""];
 const initialize = { email: "", password: "" };
-const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 /*------------------------Utils End----------------------------*/
 
 /* 
@@ -84,16 +82,72 @@ export const useInfiniteScroll = (selector, action, ...args) => {
   return [state, isInterSecting];
 };
 
-export const useFormValidation = () => {
+export const useFormValidation = (handleUserStay) => {
   const [error, setError] = useState(Map());
   const inputRef = useRef(initialize);
   const [handleRegister] = useCallDispatch(authRegister);
   const [handleLogin] = useCallDispatch(authLogin);
+  const navigate = useNavigate();
 
-  const handleForm = (value) => () => {
-    if (value === "signin") handleLogin(inputRef.current);
-    else handleRegister(inputRef.current);
+  const registerCallBack = () => handleUserStay(true);
+  const loginCallBack = () => {
+    navigate("/cloud/photos");
+  };
+
+  const handleForm = (actionType) => () => {
+    if (validateForm()) {
+      if (actionType === "signin") {
+        handleLogin({ value: inputRef.current, callBack: loginCallBack });
+      } else {
+        handleRegister({ value: inputRef.current, callBack: registerCallBack });
+      }
+    }
+  };
+
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 6;
+  };
+
+  const validateForm = () => {
+    const newErrors = { email: "", password: "" };
+    let isValid = true;
+
+    if (!inputRef.current.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!validateEmail(inputRef.current.email)) {
+      newErrors.email = "Invalid email format";
+      isValid = false;
+    }
+
+    if (!inputRef.current.password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (!validatePassword(inputRef.current.password)) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    setError(fromJS(newErrors));
+    return isValid;
   };
 
   return [handleForm, error, setError, inputRef];
+};
+
+export const useDebounce = (value, delay = 300) => {
+  const [state, setState] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setState(value);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return [state];
 };

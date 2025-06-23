@@ -104,7 +104,10 @@ const LoginCompound = () => {
 LoginCompound.Input = ({ ref, type, error, setError, isUserStay }) => {
   const [state, handleChange] = useInputHook();
   useEffect(() => {
-    if (state) ref.current[type.toLowerCase()] = state.trim();
+    if (state) {
+      ref.current[type.toLowerCase()] = state.trim();
+      setError((prev) => prev.set(type.toLowerCase(), ""));
+    }
   }, [state]);
 
   useEffect(() => {
@@ -144,7 +147,7 @@ LoginCompound.Button = ({ children, click }) => {
   return (
     <button
       className="bg-sky-600 w-full py-3 text-white font-bold rounded"
-      onClick={() => click()}
+      onClick={click}
     >
       {children}
     </button>
