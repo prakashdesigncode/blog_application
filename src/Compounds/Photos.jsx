@@ -60,7 +60,7 @@ const Photos = () => {
   return (
     <>
       <ShowSinglePhoto handleClose={handleClose} open={open} />
-      <div className="flex flex-wrap gap-20 h-[100%] mt-8 ">
+      <div className="flex  flex-wrap gap-15 mt-8 ">
         {isLoading ? (
           <Skeleton />
         ) : (
@@ -75,7 +75,7 @@ const Photos = () => {
             ) : (
               infinite.map((value, index) => (
                 <div
-                  className="flex flex-col gap-4   w-86 "
+                  className="flex flex-col   w-86 "
                   ref={infinite.size - 1 === index ? isInterSecting : null}
                   key={index}
                 >

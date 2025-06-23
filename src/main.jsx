@@ -12,7 +12,7 @@ import { CircularProgress } from "@mui/material";
 const LoginCompound = lazy(() => import("./Login"));
 const DashboardCompound = lazy(() => import("./Dashboard"));
 const Photos = lazy(() => import("./Compounds/Photos"));
-const Posts = lazy(() => import("./Compounds/Posts"));
+const Albums = lazy(() => import("./Compounds/Albums"));
 
 const CheckRedirect = ({ children }) => {
   const isHere = localStorage.getItem("token");
@@ -62,8 +62,7 @@ createRoot(document.getElementById("root")).render(
             element={
               <Suspense fallback={<CircularProgress />}>
                 <CheckRedirect>
-                  {" "}
-                  <LoginCompound />
+                  <Albums />
                 </CheckRedirect>
               </Suspense>
             }

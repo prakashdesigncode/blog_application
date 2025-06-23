@@ -31,8 +31,12 @@ const successGetUserPhotos = (state, action) => {
 };
 
 const successGetSingedUrl = (state, action) => {
-  console.log(action.payload, 34, action);
   state = state.set("isLoading", false);
+  return state;
+};
+
+const successFetchAlbums = (state, action) => {
+  state = state.set("albums", fromJS(action.payload)).set("isLoading", false);
   return state;
 };
 
@@ -43,4 +47,5 @@ export {
   successCallBackRegister,
   successGetUserPhotos,
   successGetSingedUrl,
+  successFetchAlbums,
 };

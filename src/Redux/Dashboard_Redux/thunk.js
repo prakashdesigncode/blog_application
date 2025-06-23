@@ -36,20 +36,24 @@ const uploadPhoto = createAsyncThunk("photos/uploadPhoto", async (payload) => {
   return response?.data;
 });
 
-const createAlbums = createAsyncThunk(
-  "albums/createAlbums",
-  async (payload) => {
-    const response = await axios.post(Base_Url + "albums", payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response?.data;
-  }
-);
+const createAlbums = createAsyncThunk("albums/createAlbums", async (data) => {
+  const { callBack, payload } = data;
+  const response = await axios.post(Base_Url + "albums", payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  callBack(response?.data);
+  return response?.data;
+});
 
-const fetchAlbums = createAsyncThunk("albums/fetchAlbums", async () => {
-  const response = await axios.get(Base_Url + "albums");
+const fetchAlbums = createAsyncThunk("albums/fetchAlbums", async (userId) => {
+  const response = await axios.get(Base_Url + "albums", {
+    params: { userId },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response?.data;
 });
 
@@ -83,6 +87,24 @@ const deleteSinglePhoto = createAsyncThunk(
   }
 );
 
+const getAlbumPhotos = createAsyncThunk(
+  "albums/getAlbumPhotos",
+  async (payload) => {
+    const { ids, callBack } = payload;
+    const response = await axios.post(
+      Base_Url + "photos/albumPhotos",
+      { ids },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    callBack(response?.data);
+    return response?.data;
+  }
+);
+
 export {
   authLogin,
   authRegister,
@@ -91,4 +113,6 @@ export {
   fetchAlbums,
   getSingedUrl,
   deleteSinglePhoto,
+  createAlbums,
+  getAlbumPhotos,
 };

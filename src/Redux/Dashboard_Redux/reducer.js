@@ -7,9 +7,16 @@ import {
   successCallBackRegister,
   successGetUserPhotos,
   successGetSingedUrl,
+  successFetchAlbums,
 } from "./utils";
 
-import { authLogin, authRegister, fetchPhotos, getSingedUrl } from "./thunk";
+import {
+  authLogin,
+  authRegister,
+  fetchPhotos,
+  getSingedUrl,
+  fetchAlbums,
+} from "./thunk";
 
 /*----------------------Static Utils------------------------*/
 const initialState = fromJS({ isAuthenticate: false });
@@ -48,6 +55,12 @@ export const dashboardReducer = createSlice({
     builder.addCase(getSingedUrl.fulfilled, successGetSingedUrl);
     builder.addCase(getSingedUrl.rejected, errorCallBack);
     /*---SignedUrl End-----*/
+
+    /*---Albums Start---*/
+    builder.addCase(fetchAlbums.pending, pendingCallBack);
+    builder.addCase(fetchAlbums.fulfilled, successFetchAlbums);
+    builder.addCase(fetchAlbums.rejected, errorCallBack);
+    /*---Albums End-----*/
   },
 });
 export const { setData } = dashboardReducer.actions;

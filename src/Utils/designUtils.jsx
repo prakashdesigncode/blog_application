@@ -1,29 +1,31 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import React from "react";
 import Popover from "@mui/material/Popover";
 import {
   Dialog,
-  List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   ListSubheader,
-  Slide,
+  List as MuiList,
 } from "@mui/material";
 import { MdImage } from "react-icons/md";
 import { BiPhotoAlbum } from "react-icons/bi";
 import { FaArrowLeft } from "react-icons/fa6";
 import { HiDotsVertical } from "react-icons/hi";
 import { MdDeleteOutline } from "react-icons/md";
-import { useCallDispatch } from "../Hooks/customHooks";
+import { useCallDispatch, useInputHook } from "../Hooks/customHooks";
 import {
   deleteSinglePhoto,
   fetchPhotos,
+  getAlbumPhotos,
   getSingedUrl,
   uploadPhoto,
 } from "../Redux/Dashboard_Redux/thunk";
-import { Map } from "immutable";
+import { Map, List, fromJS, set } from "immutable";
 import * as jwtDecode from "jwt-decode";
+import moment from "moment";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export const AddPhotoPopover = ({ children }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -51,7 +53,6 @@ export const AddPhotoPopover = ({ children }) => {
   };
   const open = Boolean(anchorEl);
   const id = open ? "add-photo-popover" : undefined;
-
   return (
     <div>
       {children({ handleClick })}
@@ -65,7 +66,7 @@ export const AddPhotoPopover = ({ children }) => {
           horizontal: "left",
         }}
       >
-        <List
+        <MuiList
           sx={{
             width: "100%",
             maxWidth: 500,
@@ -124,58 +125,125 @@ export const AddPhotoPopover = ({ children }) => {
               </ListItemButton>
             )}
           </CreateAlbumDialog>
-        </List>
+        </MuiList>
       </Popover>
     </div>
   );
 };
 
-export const CreateAlbumDialog = ({ children }) => {
-  const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="down" ref={ref} {...props} />;
-  });
+export const CreateAlbumDialog = ({
+  children,
+  title = "",
+  photosIds = List([]),
+  createdAt = "",
+  handleOpenImage = () => {},
+}) => {
+  const [input, setInput] = useInputHook();
+  const [params, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const handleInput = (event) => {
+    setInput(event);
+    setSearchParams({ ...params, title: event.target.value, creation: true });
+  };
   const [open, setOpen] = useState(false);
   const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = (type) => {
+    if (type === "addPhotos") {
+      const newParams = new URLSearchParams(params.toString());
+      navigate({
+        pathname: "/cloud/photos",
+        search: newParams.toString(),
+      });
+    }
+    setOpen(false);
+  };
+  const [getPhotos] = useCallDispatch(getAlbumPhotos);
+  const [photos, setPhotos] = useState(List([]));
+  const callBack = (data) => setPhotos(fromJS(data));
+  const [imageLoading, setImageLoading] = useState(Map({}));
+  useEffect(() => {
+    if (open) getPhotos({ ids: photosIds.toJS(), callBack });
+  }, [open]);
   return (
     <React.Fragment>
       {children({ handleClickOpen })}
-      <Dialog
-        fullScreen
-        open={open}
-        slots={{
-          transition: Transition,
-        }}
-      >
-        <div className="p-5 bg-[#1E1F20] flex gap-25 flex-col h-dvh">
-          <div className="flex justify-between">
-            <FaArrowLeft
-              className="text-white cursor-pointer"
-              size={25}
-              onClick={handleClose}
-            />
-            <HiDotsVertical className="text-white cursor-pointer" size={25} />
-          </div>
-          <div className="grow-1 px-10">
-            <div>
-              <input
-                type="text"
-                placeholder="Add Title"
-                className="w-full bg-transparent border-b-2 outline-0 h-15 text-4xl border-b-neutral-300 text-white"
+      <Dialog fullScreen open={open} onClose={handleClose}>
+        <div className="h-dvh bg-[#1E1F20]">
+          <div className="p-5  flex gap-25 flex-col">
+            <div className="flex justify-between">
+              <FaArrowLeft
+                className="text-white cursor-pointer"
+                size={25}
+                onClick={handleClose}
               />
             </div>
-            <div className="flex items-center mt-25 gap-5 justify-center w-full flex-col">
-              <div className="text-neutral-300 text-2xl">Album is empty</div>
+            <div className="grow-1 px-10">
               <div>
-                <div className="rounded-3xl bg-sky-600 text-1xl font-semibold px-4 py-2 cursor-pointer ">
-                  Add photos
-                </div>
+                <input
+                  type="text"
+                  value={title ? title : input}
+                  onChange={handleInput}
+                  disabled={title}
+                  placeholder="Add Title"
+                  className="w-full bg-transparent border-b-2 outline-0 h-15 text-4xl border-b-neutral-300 text-white"
+                />
+                {photosIds.size > 0 && (
+                  <div className="text-neutral-300 font-bold text-1xl mt-2 mx-3 self-start">
+                    {moment(createdAt).format("ddd, MMM D, YYYY")}
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="flex justify-center">
-              <img src="https://www.gstatic.com/social/photosui/images/empty_state_album_220x204dp.svg" />
+              {photosIds.size === 0 && (
+                <div className="flex items-center mt-25 gap-5 justify-center w-full flex-col">
+                  <div className="text-neutral-300 text-2xl">
+                    Album is empty
+                  </div>
+                  <div>
+                    <div
+                      onClick={() => handleClose("addPhotos")}
+                      className="rounded-3xl bg-sky-600 text-1xl text-neutral-300 font-semibold px-4 py-2 cursor-pointer "
+                    >
+                      Add photos
+                    </div>
+                  </div>
+                  <div className="flex justify-center">
+                    <img src="https://www.gstatic.com/social/photosui/images/empty_state_album_220x204dp.svg" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
+          {photosIds.size > 0 && (
+            <div className="flex flex-wrap gap-4  mx-13">
+              {photos.map((value, index) => (
+                <div className="flex flex-wrap gap-4   w-86 " key={index}>
+                  <img
+                    onClick={() =>
+                      handleOpenImage(
+                        value.get("key", ""),
+                        value.get("_id", "")
+                      )
+                    }
+                    className={` h-60 w-90 object-cover rounded ${
+                      imageLoading.get(index, true) ? "hidden" : "block"
+                    }`}
+                    src={value.get("thumbnailUrl", "")}
+                    onLoad={() =>
+                      setImageLoading((prev) => prev.set(index, false))
+                    }
+                  />
+                  {imageLoading.get(index, true) && (
+                    <div
+                      key={index}
+                      className=" animate-pulse w-93 gap-4 flex justify-center flex-col max-w-sm rounded-md   p-4"
+                    >
+                      <div className="h-55 w-80 rounded-3xl bg-neutral-300"></div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Dialog>
     </React.Fragment>
@@ -195,7 +263,7 @@ export const ShowSinglePhoto = ({ handleClose, open }) => {
   }, [open]);
   return (
     <React.Fragment>
-      <Dialog fullScreen open={open.get("open", false)}>
+      <Dialog fullScreen open={open.get("open", false)} sx={{ zIndex: 1301 }}>
         <div className="p-5 bg-[#1E1F20] flex gap-10 flex-col h-dvh">
           <div className="flex justify-between">
             <FaArrowLeft
