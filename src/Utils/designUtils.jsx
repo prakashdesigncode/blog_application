@@ -727,7 +727,7 @@ const Header = ({ onClickOpen }) => {
   const handleLogout = () => {
     setReduxData(fromJS({ userPhotos: [], albums: [] }));
     localStorage.removeItem("token");
-    navigate("/");
+    navigate("/login");
   };
 
   const handleCreateAlbum = (ids) => {

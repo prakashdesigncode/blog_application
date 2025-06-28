@@ -39,6 +39,11 @@ const successFetchAlbums = (state, action) => {
   return state;
 };
 
+const successCallBack = (state, action) => {
+  state = state.set("isLoading", false);
+  return state;
+};
+
 export {
   pendingCallBack,
   errorCallBack,
@@ -47,4 +52,5 @@ export {
   successGetUserPhotos,
   successGetSingedUrl,
   successFetchAlbums,
+  successCallBack,
 };

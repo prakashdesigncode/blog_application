@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import React, { Fragment, useEffect } from "react";
 import {
   useInputHook,
   useBooleanHook,
   useFormValidation,
+  useSelectedValue,
 } from "../Hooks/customHooks";
-import { TextField } from "@mui/material";
+import { CircularProgress, TextField } from "@mui/material";
 import { Map } from "immutable";
+import { selectedIsLoading } from "../Redux/Dashboard_Redux/selector";
 
 /*--------------------Utils Start------------------------*/
 const inputSx = {
@@ -36,84 +38,92 @@ const inputSx = {
 
 const LoginCompound = () => {
   const [isUserStay, handleUserStay] = useBooleanHook(true);
+  const [isLoading] = useSelectedValue(selectedIsLoading);
 
   const [handleForm, error, setError, inputRef] =
     useFormValidation(handleUserStay);
 
   return (
-    <div className="w-full h-dvh flex items-center justify-center ">
-      <div className="w-[31rem] px-5 py-1">
-        <div className=" mb-10">
-          <div className="text-center mb-4">
-            <span className="font-bold text-4xl">
-              <span className="text-sky-500">G</span>
-              <span className="text-red-500">o</span>
-              <span className="text-yellow-500">o</span>
-              <span className="text-sky-500">g</span>
-              <span className="text-green-500">l</span>
-              <span className="text-red-500">e</span>
-            </span>
-            <span className="text-2xl mx-2">Photos</span>
-          </div>
-          <div className="text-[18px] font-bold ">
-            Sign {isUserStay ? "in" : "up"} to your account
-          </div>
-          {isUserStay ? (
-            <div className="mt-3 text-gray-400 font-bold">
-              Don`t have an account?{" "}
-              <span
-                className="text-green-600 font-bold mx-1 cursor-pointer"
-                onClick={() => handleUserStay(false)}
-              >
-                Get started
+    <Fragment>
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <CircularProgress size={60} />
+        </div>
+      )}
+      <div className="w-full h-dvh flex items-center justify-center ">
+        <div className="w-[31rem] px-5 py-1">
+          <div className=" mb-10">
+            <div className="text-center mb-4">
+              <span className="font-bold text-4xl">
+                <span className="text-sky-500">G</span>
+                <span className="text-red-500">o</span>
+                <span className="text-yellow-500">o</span>
+                <span className="text-sky-500">g</span>
+                <span className="text-green-500">l</span>
+                <span className="text-red-500">e</span>
               </span>
+              <span className="text-2xl mx-2">Photos</span>
             </div>
-          ) : (
-            <div className="mt-3 text-gray-400 font-bold">
-              I have an account?{" "}
-              <span
-                className="text-green-600 font-bold mx-1 cursor-pointer"
-                onClick={() => handleUserStay(true)}
-              >
-                Get started
-              </span>
+            <div className="text-[18px] font-bold ">
+              Sign {isUserStay ? "in" : "up"} to your account
+            </div>
+            {isUserStay ? (
+              <div className="mt-3 text-gray-400 font-bold">
+                Don`t have an account?{" "}
+                <span
+                  className="text-green-600 font-bold mx-1 cursor-pointer"
+                  onClick={() => handleUserStay(false)}
+                >
+                  Get started
+                </span>
+              </div>
+            ) : (
+              <div className="mt-3 text-gray-400 font-bold">
+                I have an account?{" "}
+                <span
+                  className="text-green-600 font-bold mx-1 cursor-pointer"
+                  onClick={() => handleUserStay(true)}
+                >
+                  Get started
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <LoginCompound.Input
+              type="Email"
+              ref={inputRef}
+              error={error}
+              setError={setError}
+              isUserStay={isUserStay}
+            />
+          </div>
+          <div>
+            <LoginCompound.Input
+              type="Password"
+              ref={inputRef}
+              error={error}
+              setError={setError}
+              isUserStay={isUserStay}
+            />
+          </div>
+          {error.get("common", "") && (
+            <div className="font-bold mb-2 text-red-600">
+              {error.get("common", "")}
             </div>
           )}
-        </div>
-
-        <div>
-          <LoginCompound.Input
-            type="Email"
-            ref={inputRef}
-            error={error}
-            setError={setError}
-            isUserStay={isUserStay}
-          />
-        </div>
-        <div>
-          <LoginCompound.Input
-            type="Password"
-            ref={inputRef}
-            error={error}
-            setError={setError}
-            isUserStay={isUserStay}
-          />
-        </div>
-        {error.get("common", "") && (
-          <div className="font-bold mb-2 text-red-600">
-            {error.get("common", "")}
+          <div>
+            <LoginCompound.Button
+              click={handleForm(isUserStay ? "signin" : "signup")}
+              error={error}
+            >
+              {isUserStay ? "Sign In" : "Sign Up"}
+            </LoginCompound.Button>
           </div>
-        )}
-        <div>
-          <LoginCompound.Button
-            click={handleForm(isUserStay ? "signin" : "signup")}
-            error={error}
-          >
-            {isUserStay ? "Sign In" : "Sign Up"}
-          </LoginCompound.Button>
         </div>
       </div>
-    </div>
+    </Fragment>
   );
 };
 

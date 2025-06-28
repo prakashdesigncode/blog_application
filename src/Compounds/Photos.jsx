@@ -89,7 +89,6 @@ const Photos = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [reduxData] = useCallDispatch(setData);
   const [imageCollections, setImageCollections] = useState(List([]));
-
   const handleCloseSlider = (index) => {
     setOpenSlider(!openSlider);
     setSearchParams({ index });
@@ -121,7 +120,12 @@ const Photos = () => {
   }, [photos]);
 
   return (
-    <>
+    <Fragment>
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <CircularProgress size={60} />
+        </div>
+      )}
       {openSlider && (
         <ImageSlider
           open={openSlider}
@@ -188,7 +192,7 @@ const Photos = () => {
           </>
         )}
       </div>
-    </>
+    </Fragment>
   );
 };
 

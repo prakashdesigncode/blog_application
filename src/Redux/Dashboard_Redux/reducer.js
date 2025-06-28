@@ -8,6 +8,7 @@ import {
   successGetUserPhotos,
   successGetSingedUrl,
   successFetchAlbums,
+  successCallBack,
 } from "./utils";
 
 import {
@@ -16,6 +17,10 @@ import {
   fetchPhotos,
   getSingedUrl,
   fetchAlbums,
+  uploadPhoto,
+  deleteSinglePhoto,
+  createAlbums,
+  getAlbumPhotos,
 } from "./thunk";
 
 /*----------------------Static Utils------------------------*/
@@ -61,6 +66,29 @@ export const dashboardReducer = createSlice({
     builder.addCase(fetchAlbums.fulfilled, successFetchAlbums);
     builder.addCase(fetchAlbums.rejected, errorCallBack);
     /*---Albums End-----*/
+
+    builder.addCase(uploadPhoto.pending, pendingCallBack);
+    builder.addCase(uploadPhoto.fulfilled, successCallBack);
+    builder.addCase(uploadPhoto.rejected, errorCallBack);
+    /*---Upload Photo End-----*/
+
+    /*---Delete Photo Start---*/
+    builder.addCase(deleteSinglePhoto.pending, pendingCallBack);
+    builder.addCase(deleteSinglePhoto.fulfilled, successCallBack);
+    builder.addCase(deleteSinglePhoto.rejected, errorCallBack);
+    /*---Delete Photo End-----*/
+
+    /*---Create Album Start---*/
+    builder.addCase(createAlbums.pending, pendingCallBack);
+    builder.addCase(createAlbums.fulfilled, successCallBack);
+    builder.addCase(createAlbums.rejected, errorCallBack);
+    /*---Create Album End-----*/
+
+    /*---Get Album Photos Start---*/
+    builder.addCase(getAlbumPhotos.pending, pendingCallBack);
+    builder.addCase(getAlbumPhotos.fulfilled, successCallBack);
+    builder.addCase(getAlbumPhotos.rejected, errorCallBack);
+    /*---Get Album Photos End-----*/
   },
 });
 export const { setData } = dashboardReducer.actions;
