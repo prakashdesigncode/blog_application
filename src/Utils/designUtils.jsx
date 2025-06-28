@@ -398,6 +398,7 @@ export const CreateAlbumDialog = ({
   useEffect(() => {
     if (open) getPhotos({ ids: photosIds.toJS(), callBack });
   }, [open]);
+  console.log(open, 401);
   return (
     <React.Fragment>
       {children({ handleClickOpen })}
@@ -521,9 +522,9 @@ export const ShowSinglePhoto = ({ handleClose, open, isAlbum = false }) => {
               />
             )}
           </div>
-          <div className="px-10 bg-">
+          <div className="px-10 ">
             <img
-              className={`object-cover w-full h-[85vh] rounded ${
+              className={`object-cover w-full h-auto  sm:h-[85vh] rounded ${
                 imageLoading.get("isLoading", true) ? "hidden" : "block"
               }`}
               src={imageLoading.get("url", "")}
@@ -852,6 +853,16 @@ const MenuList = ({ open, mobileOpen }) => {
   const [albums, setAlbums] = useState(List([]));
   const allAlbums = useSelector(selectedAlbums);
   const navigate = useNavigate();
+  const decode = jwtDecode.jwtDecode(localStorage.getItem("token"));
+  const handleOpenImage = (key, _id) => {
+    setOpenImage((prev) =>
+      prev
+        .set("key", key)
+        .set("open", true)
+        .set("_id", _id)
+        .set("userId", decode.sub)
+    );
+  };
   const handleNavigation = (path) => {
     setSearchParams({ current: path });
     navigate(`/${path}?current=${path}`);
@@ -935,13 +946,13 @@ const MenuList = ({ open, mobileOpen }) => {
         </ListItem>
       ))}
       {expandedMenu && (
-        <div className="hidden sm:block ml-8 sm:ml-12 mt-1 mb-3 transition-all duration-300">
+        <div className=" ml-8 sm:ml-12 mt-1 mb-3 transition-all duration-300">
           {albums.map((album, index) => (
             <CreateAlbumDialog
               title={album.get("title", "")}
               photosIds={album.get("photoIds", List())}
               createdAt={album.get("createdAt", "")}
-              // handleOpenImage={handleOpenImage}
+              handleOpenImage={handleOpenImage}
               key={index}
             >
               {({ handleClickOpen }) => (

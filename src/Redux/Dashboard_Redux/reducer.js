@@ -20,7 +20,6 @@ import {
   uploadPhoto,
   deleteSinglePhoto,
   createAlbums,
-  getAlbumPhotos,
 } from "./thunk";
 
 /*----------------------Static Utils------------------------*/
@@ -83,12 +82,6 @@ export const dashboardReducer = createSlice({
     builder.addCase(createAlbums.fulfilled, successCallBack);
     builder.addCase(createAlbums.rejected, errorCallBack);
     /*---Create Album End-----*/
-
-    /*---Get Album Photos Start---*/
-    builder.addCase(getAlbumPhotos.pending, pendingCallBack);
-    builder.addCase(getAlbumPhotos.fulfilled, successCallBack);
-    builder.addCase(getAlbumPhotos.rejected, errorCallBack);
-    /*---Get Album Photos End-----*/
   },
 });
 export const { setData } = dashboardReducer.actions;

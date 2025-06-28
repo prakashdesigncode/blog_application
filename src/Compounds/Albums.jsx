@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   selectedAlbums,
   selectedIsLoading,
 } from "../Redux/Dashboard_Redux/selector";
 import { fetchAlbums } from "../Redux/Dashboard_Redux/thunk";
-import { useInfiniteScroll, useSelectedValue } from "../Hooks/customHooks";
+import { useCallDispatch, useSelectedValue } from "../Hooks/customHooks";
 import SkeletonPhotos from "./SkeletonPhotos";
 
 import { List, Map } from "immutable";
@@ -13,9 +13,10 @@ import * as jwtDecode from "jwt-decode";
 import { CircularProgress } from "@mui/material";
 
 const Albums = () => {
-  const [infinite, _] = useInfiniteScroll(selectedAlbums, fetchAlbums);
+  const [getAlbumsApi] = useCallDispatch(fetchAlbums);
   const [imageLoading, setImageLoading] = useState(Map({}));
   const [isLoading] = useSelectedValue(selectedIsLoading);
+  const [albums] = useSelectedValue(selectedAlbums);
   const [openImage, setOpenImage] = useState(Map({ open: false, key: "" }));
   const decode = jwtDecode.jwtDecode(localStorage.getItem("token"));
   const handleOpenImage = (key, _id) => {
@@ -29,6 +30,10 @@ const Albums = () => {
   };
   const handleCloseImage = () =>
     setOpenImage((prev) => prev.set("open", false));
+
+  useEffect(() => {
+    getAlbumsApi(decode.sub);
+  }, []);
 
   return (
     <div className="flex flex-wrap gap-5 " style={{ marginTop: "40px" }}>
@@ -46,7 +51,7 @@ const Albums = () => {
         <SkeletonPhotos />
       ) : (
         <>
-          {infinite.size <= 0 ? (
+          {albums.size <= 0 ? (
             <div className="flex justify-center h-[80vh] items-center w-full flex-col gap-4">
               <img
                 className=" h-auto"
@@ -57,12 +62,8 @@ const Albums = () => {
               </div>
             </div>
           ) : (
-            infinite.map((value, index) => (
-              <div
-                className="flex flex-col   gap-2  w-86 "
-                // ref={infinite.size - 1 === index ? isInterSecting : null}
-                key={index}
-              >
+            albums.map((value, index) => (
+              <div className="flex flex-col   gap-2  w-86 " key={index}>
                 <CreateAlbumDialog
                   title={value.get("title", "")}
                   photosIds={value.get("photoIds", List())}

@@ -419,7 +419,7 @@ export const ImageSlider = ({
                       }
                     />
                   </div>
-                  <div className="flex h-[90%] items-center justify-center text-xl font-bold">
+                  <div className="flex h-[90%] sm:p-60 items-center justify-center text-xl font-bold">
                     <img
                       src={imageLoading.getIn([imageIndex, "url"], "")}
                       alt="preview"
@@ -428,7 +428,7 @@ export const ImageSlider = ({
                           prev.setIn([imageIndex, "isLoading"], false)
                         )
                       }
-                      className={`max-w-screen max-h-screen object-contain rounded-xl shadow-xl ${
+                      className={` w-full h-auto object-cover rounded-xl shadow-xl ${
                         imageLoading.getIn([imageIndex, "isLoading"], true)
                           ? "hidden"
                           : "block"
