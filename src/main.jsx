@@ -2,10 +2,8 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import store from "./Redux/Dashboard_Redux/store";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-// import { handleLocalStorage } from "./Utils/customfunctions";
 import "./main.scss";
 import "./style.css";
-// import Home from "./Compounds/Home";
 import { Suspense, lazy } from "react";
 import { CircularProgress } from "@mui/material";
 
@@ -16,12 +14,12 @@ const Albums = lazy(() => import("./Compounds/Albums"));
 
 const CheckRedirect = ({ children }) => {
   const isHere = localStorage.getItem("token");
-  return isHere ? children : <Navigate to="/" replace />;
+  return isHere ? children : <Navigate to="/login" replace />;
 };
 
 const CheckLoginRedirect = ({ children }) => {
   const isHere = localStorage.getItem("token");
-  return isHere ? <Navigate to="/cloud/?current=0" replace /> : children;
+  return isHere ? <Navigate to="/photos" replace /> : children;
 };
 
 createRoot(document.getElementById("root")).render(
@@ -36,7 +34,7 @@ createRoot(document.getElementById("root")).render(
               </CheckLoginRedirect>
             </Suspense>
           }
-          path="/"
+          path="/login"
         />
         <Route
           element={
@@ -46,7 +44,7 @@ createRoot(document.getElementById("root")).render(
               </CheckRedirect>
             </Suspense>
           }
-          path="/cloud"
+          path="/"
         >
           <Route
             element={

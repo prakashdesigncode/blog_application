@@ -93,7 +93,7 @@ const deleteSinglePhoto = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       },
     });
-    callBack();
+    response.status === 200 && callBack();
     return response?.data;
   }
 );

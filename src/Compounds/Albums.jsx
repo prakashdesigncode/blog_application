@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   selectedAlbums,
   selectedIsLoading,
 } from "../Redux/Dashboard_Redux/selector";
 import { fetchAlbums } from "../Redux/Dashboard_Redux/thunk";
-import { useInfiniteScroll, useSelectedValue } from "../Hooks/customHooks";
+import {
+  useCallDispatch,
+  useInfiniteScroll,
+  useSelectedValue,
+} from "../Hooks/customHooks";
 import SkeletonPhotos from "./SkeletonPhotos";
 
 import { List, Map } from "immutable";
@@ -28,8 +32,9 @@ const Albums = () => {
   };
   const handleCloseImage = () =>
     setOpenImage((prev) => prev.set("open", false));
+
   return (
-    <div className="flex flex-wrap gap-10">
+    <div className="flex flex-wrap gap-5 " style={{ marginTop: "40px" }}>
       <ShowSinglePhoto
         handleClose={handleCloseImage}
         open={openImage}
@@ -55,7 +60,7 @@ const Albums = () => {
                   <>
                     <img
                       onClick={handleClickOpen}
-                      className={` h-60 w-90 mt-5 object-cover rounded ${
+                      className={` h-auto w-90 mt-5 object-cover rounded ${
                         imageLoading.get(index, true) ? "hidden" : "block"
                       }`}
                       src={value.get("thumbnail", "")}

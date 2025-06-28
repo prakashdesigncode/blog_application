@@ -91,7 +91,7 @@ export const useFormValidation = (handleUserStay) => {
 
   const registerCallBack = () => handleUserStay(true);
   const loginCallBack = () => {
-    navigate("/cloud/photos");
+    navigate("/photos");
   };
 
   const handleForm = (actionType) => () => {

@@ -14,6 +14,22 @@ const inputSx = {
     fontSize: "18px",
     fontWeight: "bold",
   },
+  "& .MuiInputBase-root": {
+    backgroundColor: "#1e1e1e",
+    color: "#fff",
+  },
+  "& .MuiOutlinedInput-root": {
+    color: "#ffffff",
+    "& fieldset": {
+      borderColor: "gray",
+    },
+    "&:hover fieldset": {
+      borderColor: "#1565c0",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#42a5f5",
+    },
+  },
 };
 
 /*--------------------Utils End---------------------------*/

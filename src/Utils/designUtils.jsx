@@ -1,22 +1,35 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import React from "react";
 import Popover from "@mui/material/Popover";
 import {
   Dialog,
   ListItemButton,
-  ListItemIcon,
-  ListItemText,
   ListSubheader,
   List as MuiList,
+  Tooltip,
 } from "@mui/material";
 import { MdImage } from "react-icons/md";
 import { BiPhotoAlbum } from "react-icons/bi";
 import { FaArrowLeft } from "react-icons/fa6";
-import { HiDotsVertical } from "react-icons/hi";
 import { MdDeleteOutline } from "react-icons/md";
-import { useCallDispatch, useInputHook } from "../Hooks/customHooks";
 import {
+  useBooleanHook,
+  useCallDispatch,
+  useDebounce,
+  useInputHook,
+  useSelectedValue,
+} from "../Hooks/customHooks";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";
+import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
+import TextField from "@mui/material/TextField";
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
+import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
+import {
+  createAlbums,
   deleteSinglePhoto,
+  fetchAlbums,
   fetchPhotos,
   getAlbumPhotos,
   getSingedUrl,
@@ -26,6 +39,188 @@ import { Map, List, fromJS } from "immutable";
 import * as jwtDecode from "jwt-decode";
 import moment from "moment";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import MuiDrawer from "@mui/material/Drawer";
+import MuiAppBar from "@mui/material/AppBar";
+import { IconButton } from "@mui/material";
+
+import CssBaseline from "@mui/material/CssBaseline";
+import ListItem from "@mui/material/ListItem";
+
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
+import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import { Avatar } from "@mui/material";
+import { setData } from "../Redux/Dashboard_Redux/reducer";
+import { IoMdArrowDropdown } from "react-icons/io";
+import { useSelector } from "react-redux";
+import {
+  selectedAlbums,
+  selectedCreation,
+} from "../Redux/Dashboard_Redux/selector";
+
+const menuIconSX = {
+  width: 40,
+  height: 40,
+  color: "inherit",
+  margin: "12px 22px 12px 4px",
+  display: "none",
+  "&:hover": {
+    backgroundColor: "#2C2D2D",
+  },
+  "@media (max-width:1007px)": {
+    display: "inline-flex",
+  },
+};
+
+const addIconSX = {
+  width: 40,
+  height: 40,
+  marginRight: "7px",
+  color: "inherit",
+  "&:hover": {
+    backgroundColor: "#2C2D2D",
+  },
+};
+
+const searchIconSX = {
+  width: 40,
+  height: 40,
+  color: "inherit",
+  "&:hover": {
+    backgroundColor: "#2C2D2D",
+  },
+  display: "none",
+  "@media (max-width:1007px)": {
+    display: "inline-flex",
+  },
+};
+
+const powerIconSX = {
+  width: 40,
+  height: 40,
+  color: "inherit",
+  marginLeft: "4px",
+  "&:hover": {
+    backgroundColor: "rgba(255, 0, 0, 0.1)",
+    color: "red",
+  },
+};
+
+const profileSX = {
+  height: "30px",
+  width: "30px",
+  fontSize: "12px",
+  textTransform: "uppercase",
+  background: "red",
+  fontWeight: "bold",
+  display: "inline-flex",
+  "@media (max-width:599px)": {
+    display: "none",
+  },
+};
+
+const SearchBar = () => {
+  const [searchText, handleSearchText] = useInputHook();
+  const [debounceSearchText] = useDebounce(searchText);
+  const [getPhotos] = useCallDispatch(fetchPhotos);
+  const decode = jwtDecode.jwtDecode(localStorage.getItem("token"));
+  useEffect(() => {
+    if (debounceSearchText)
+      getPhotos({ userId: decode.sub, searchText: debounceSearchText });
+  }, [debounceSearchText]);
+  return (
+    <div className="search-bar-container">
+      <TextField
+        className="search-bar"
+        variant="outlined"
+        placeholder="Search"
+        value={searchText}
+        onChange={handleSearchText}
+        fullWidth
+        sx={{ background: "transparent", flex: "1" }}
+        slotProps={{
+          input: {
+            startAdornment: <SearchIcon sx={{ margin: "0 15px 0 10px" }} />,
+          },
+        }}
+      />
+    </div>
+  );
+};
+
+const mockListItems = [
+  {
+    label: "Photos",
+    icon: <ImageOutlinedIcon />,
+    path: "photos",
+  },
+  {
+    label: "Collections",
+    icon: <HorizontalRuleIcon />,
+  },
+  { label: "Albums", icon: <CollectionsBookmarkIcon />, path: "albums" },
+];
+
+const drawerWidth = "256px";
+
+const openedMixin = (theme) => ({
+  width: drawerWidth,
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: "hidden",
+});
+
+const closedMixin = (theme) => ({
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: "hidden",
+  width: `80px`,
+});
+
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  ...theme.mixins.toolbar,
+}));
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme }) => ({
+  height: "64px",
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  zIndex: theme.zIndex.drawer + 1,
+  [theme.breakpoints.down("sm")]: {
+    zIndex: "auto",
+  },
+}));
+
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open && {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme),
+  }),
+}));
 
 export const AddPhotoPopover = ({ children }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -65,34 +260,59 @@ export const AddPhotoPopover = ({ children }) => {
           vertical: "bottom",
           horizontal: "left",
         }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        PaperProps={{
+          sx: {
+            background: "#1E1F20",
+            borderRadius: "12px",
+            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.5)",
+            border: "1px solid #2A2B2E",
+            paddingY: 1,
+          },
+        }}
       >
         <MuiList
           sx={{
             width: "100%",
-            maxWidth: 500,
+            maxWidth: 400,
             minWidth: 250,
-            bgcolor: "#1E1F20",
+            minHeight: 50,
+            maxHeight: 140,
           }}
           component="nav"
           aria-labelledby="nested-list-subheader"
           subheader={
             <ListSubheader
               component="div"
-              className="text-[14px]"
-              sx={{ backgroundColor: "#1E1F20", color: "grey" }}
+              sx={{
+                backgroundColor: "#1E1F20",
+                color: "#ccc",
+                fontWeight: "bold",
+                fontSize: "16px",
+                paddingY: 0,
+                paddingX: 2,
+                borderBottom: "1px solid #333",
+              }}
               id="nested-list-subheader"
             >
               Create
             </ListSubheader>
           }
         >
-          <ListItemButton>
+          <ListItemButton
+            sx={{
+              "&:hover": {
+                backgroundColor: "#2C2D30",
+              },
+              paddingY: 1,
+              paddingX: 2,
+            }}
+          >
             <ListItemIcon>
-              <MdImage
-                className="text-neutral-300 ms-2"
-                size={22}
-                variant={"stroke"}
-              />
+              <MdImage className="text-neutral-300 ms-1" size={22} />
             </ListItemIcon>
             <input
               ref={file}
@@ -104,23 +324,34 @@ export const AddPhotoPopover = ({ children }) => {
             />
             <ListItemText
               onClick={handleOpenFile}
-              primary="Import Photos"
-              className="text-neutral-300"
+              primary={
+                <div className="font-medium text-neutral-300">
+                  Import Photos
+                </div>
+              }
             />
           </ListItemButton>
-          <CreateAlbumDialog>
+
+          {/* Create Album */}
+          <CreateAlbumDialog handleClosePopover={handleClose}>
             {({ handleClickOpen }) => (
-              <ListItemButton onClick={handleClickOpen}>
+              <ListItemButton
+                onClick={handleClickOpen}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "#2C2D30",
+                  },
+                  paddingY: 1,
+                  paddingX: 2,
+                }}
+              >
                 <ListItemIcon>
-                  <BiPhotoAlbum
-                    className="text-neutral-300 ms-2"
-                    size={22}
-                    variant={"stroke"}
-                  />
+                  <BiPhotoAlbum className="text-neutral-300 ms-1" size={22} />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Album"
-                  className="text-neutral-300 font-semibold"
+                  primary={
+                    <div className="font-medium text-neutral-300">Album</div>
+                  }
                 />
               </ListItemButton>
             )}
@@ -137,8 +368,9 @@ export const CreateAlbumDialog = ({
   photosIds = List([]),
   createdAt = "",
   handleOpenImage = () => {},
+  handleClosePopover = () => {},
 }) => {
-  const [input, setInput] = useInputHook();
+  const [input, setInput] = useInputHook("Sample Album");
   const [params, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const handleInput = (event) => {
@@ -149,9 +381,12 @@ export const CreateAlbumDialog = ({
   const handleClickOpen = () => setOpen(true);
   const handleClose = (type) => {
     if (type === "addPhotos") {
+      if (!input) return;
+      handleClosePopover();
       const newParams = new URLSearchParams(params.toString());
+      setSearchParams({ title: input });
       navigate({
-        pathname: "/cloud/photos",
+        pathname: "/photos",
         search: newParams.toString(),
       });
     }
@@ -185,8 +420,10 @@ export const CreateAlbumDialog = ({
                   onChange={handleInput}
                   disabled={title}
                   placeholder="Add Title"
-                  className="w-full bg-transparent border-b-2 outline-0 h-15 text-4xl border-b-neutral-300 text-white"
+                  className="w-full bg-transparent border-b-2 outline-none text-white border-b-neutral-300
+             text-2xl sm:text-3xl md:text-4xl h-12 sm:h-14 md:h-16"
                 />
+
                 {photosIds.size > 0 && (
                   <div className="text-neutral-300 font-bold text-1xl mt-2 mx-3 self-start">
                     {moment(createdAt).format("ddd, MMM D, YYYY")}
@@ -224,7 +461,7 @@ export const CreateAlbumDialog = ({
                         value.get("_id", "")
                       )
                     }
-                    className={` h-60 w-90 object-cover rounded ${
+                    className={` h-auto w-full object-cover rounded ${
                       imageLoading.get(index, true) ? "hidden" : "block"
                     }`}
                     src={value.get("thumbnailUrl", "")}
@@ -323,5 +560,409 @@ export const ShowSinglePhoto = ({ handleClose, open, isAlbum = false }) => {
         </div>
       </Dialog>
     </React.Fragment>
+  );
+};
+
+export const MiniDrawer = ({ children }) => {
+  const [open, setOpen] = React.useState(true);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [isClosing, setIsClosing] = React.useState(false);
+
+  const container =
+    typeof window !== "undefined" ? () => window.document.body : undefined;
+
+  const handleDrawerToggle = () => {
+    if (!isClosing) {
+      setMobileOpen(!mobileOpen);
+    }
+  };
+
+  const handleDrawerTransitionEnd = () => {
+    setIsClosing(false);
+  };
+
+  const handleDrawerClose = () => {
+    setIsClosing(true);
+    setMobileOpen(false);
+  };
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1007) {
+        setOpen(true);
+      } else {
+        setOpen(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const drawerContent = (
+    <Box
+      onClick={handleDrawerToggle}
+      sx={{ textAlign: "center", padding: "0 12px 0 12px" }}
+    >
+      <Box
+        sx={{
+          height: "64px",
+          display: "flex",
+          justifyContent: "end",
+          alignItems: "center",
+        }}
+      >
+        <Avatar alt="Profile" sx={profileSX} />
+      </Box>
+      <Box
+        className="flex items-center justify-center"
+        sx={{
+          height: "64px",
+          paddingBottom: "1px",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <span className="logo" />
+        <span className="header-title">Photos</span>
+      </Box>
+      <MuiList style={{ padding: 0 }}>
+        <MenuList open={open} mobileOpen={mobileOpen} />
+      </MuiList>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <AppBar position="fixed" elevation={0}>
+        <Header onClickOpen={handleDrawerToggle} />
+      </AppBar>
+
+      <MuiDrawer
+        container={container}
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerClose}
+        onTransitionEnd={handleDrawerTransitionEnd}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          display: { xs: "block", sm: "none" },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: drawerWidth,
+            background: "#1e1f20",
+            color: "#c4c7c5",
+            border: "none",
+          },
+        }}
+      >
+        {drawerContent}
+      </MuiDrawer>
+
+      <Drawer
+        variant="permanent"
+        open={open}
+        sx={{
+          display: { xs: "none", sm: "block" },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            background: "#1e1f20",
+            color: "#c4c7c5",
+            border: "none",
+          },
+        }}
+      >
+        <DrawerHeader />
+        <MuiList sx={{ padding: "24px 12px 16px 12px" }}>
+          <MenuList open={open} mobileOpen={mobileOpen} />
+        </MuiList>
+      </Drawer>
+
+      <Box
+        component="main"
+        style={{
+          height: "100dvh",
+          width: "100%",
+          overflow: "auto",
+          background: "#1e1f20",
+          color: "#e3e3e3",
+        }}
+      >
+        <DrawerHeader />
+        <Box
+          sx={{
+            height: "calc(100dvh - 74px)",
+            overflow: "auto",
+            background: "#131314",
+            color: "#e3e3e3",
+            marginRight: { xs: "0px", sm: "20px" },
+            marginBottom: { xs: "10px", sm: "0px" },
+            borderRadius: { xs: "0px", sm: "20px" },
+            paddingRight: "32px",
+            paddingLeft: "16px",
+            paddingTop: "12px",
+          }}
+        >
+          {children}
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+const Header = ({ onClickOpen }) => {
+  const navigate = useNavigate();
+  const [setReduxData] = useCallDispatch(setData);
+  const [creation] = useSelectedValue(selectedCreation);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [createAlbumApi] = useCallDispatch(createAlbums);
+  const [getAlbumsApi] = useCallDispatch(fetchAlbums);
+  const [uploadImages] = useCallDispatch(uploadPhoto);
+  const decode = jwtDecode.jwtDecode(localStorage.getItem("token"));
+  const albumName = searchParams.get("title") || "new album";
+  const email = decode.email;
+  const file = useRef(null);
+  const handleLogout = () => {
+    setReduxData(fromJS({ userPhotos: [], albums: [] }));
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  const handleCreateAlbum = (ids) => {
+    const callBack = () => {
+      setReduxData(fromJS({ creation: {} }));
+      setSearchParams({});
+      getAlbumsApi(jwtDecode.jwtDecode(localStorage.getItem("token")).sub);
+    };
+    const payload = {
+      title: albumName,
+      userId: jwtDecode.jwtDecode(localStorage.getItem("token")).sub,
+      photoIds: ids.length ? ids : creation.toJS(),
+    };
+    createAlbumApi({ payload, callBack });
+  };
+
+  const handleFileInput = (event) => {
+    const callBack = ({ results }) => {
+      const ids = results.map((value) => value._id);
+      handleCreateAlbum(ids);
+    };
+    const formData = new FormData();
+    const files = event.target.files;
+    [...files].forEach((file) => {
+      formData.append(`files`, file);
+    });
+    formData.append("userId", decode.sub);
+    uploadImages({ formData, callBack });
+  };
+  const handleOpenFile = () => {
+    file.current.click();
+  };
+
+  return (
+    <header>
+      <div className="header-left">
+        <IconButton sx={menuIconSX} onClick={onClickOpen}>
+          <MenuIcon />
+        </IconButton>
+        <span className="logo head_logo" />
+        {creation.size <= 0 && <span className="header-title">Photos</span>}
+      </div>
+      <div className="flex justify-between grow-1 items-center">
+        <SearchBar />
+        <div className="grow-1 header-right">
+          {creation.size <= 0 && (
+            <IconButton sx={searchIconSX}>
+              <SearchIcon />
+            </IconButton>
+          )}
+
+          {creation.size <= 0 && searchParams.get("title") && (
+            <div
+              onClick={handleOpenFile}
+              className="cursor-pointer text-blue-500 mr-4"
+            >
+              Select Form Computer
+            </div>
+          )}
+          <input
+            ref={file}
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleFileInput}
+            className="hidden"
+          />
+          {creation.size > 0 && (
+            <div className="flex items-center gap-2">
+              <div
+                style={{ padding: "7px 20px" }}
+                className="rounded-3xl flex items-center gap-2 text-neutral-300 bg-neutral-600 text-sm sm:text-base font-semibold cursor-pointer"
+              >
+                <div>{creation.size} Items Selected</div>
+              </div>
+              <div
+                className="rounded-3xl text-white bg-sky-600 text-sm sm:text-base font-semibold  cursor-pointer"
+                style={{ padding: "7px 20px" }}
+                onClick={handleCreateAlbum}
+              >
+                Done
+              </div>
+            </div>
+          )}
+          {creation.size <= 0 && (
+            <>
+              <AddPhotoPopover>
+                {({ handleClick }) => (
+                  <Tooltip
+                    title="Create And Add Photos"
+                    aria-describedby="add-photo-popover"
+                    onClick={handleClick}
+                  >
+                    <IconButton sx={addIconSX}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </AddPhotoPopover>
+
+              <Tooltip title={email}>
+                <Avatar alt="Profile" sx={profileSX}>
+                  {email[0]}
+                </Avatar>
+              </Tooltip>
+              <Tooltip title="Logout">
+                <IconButton sx={powerIconSX} onClick={handleLogout}>
+                  <PowerSettingsNewIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
+
+const MenuList = ({ open, mobileOpen }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [expandedMenu, setExpandedMenu] = useBooleanHook(false);
+  const [getAlbumsApi] = useCallDispatch(fetchAlbums);
+  const [albums, setAlbums] = useState(List([]));
+  const allAlbums = useSelector(selectedAlbums);
+  const navigate = useNavigate();
+  const handleNavigation = (path) => {
+    setSearchParams({ current: path });
+    navigate(`/${path}?current=${path}`);
+  };
+  const path = searchParams.get("current") || "photos";
+  useEffect(() => {
+    getAlbumsApi(jwtDecode.jwtDecode(localStorage.getItem("token")).sub);
+  }, []);
+
+  useEffect(() => {
+    setAlbums(List(allAlbums));
+  }, [allAlbums]);
+  return (
+    <Fragment>
+      {mockListItems.map((item, index) => (
+        <ListItem
+          sx={{ padding: item.path && "15px 0" }}
+          key={item.label}
+          disabled={!item.path}
+          onClick={() => item.path && handleNavigation(item.path)}
+          disablePadding
+        >
+          <ListItemButton
+            selected={item.path === path && item.path}
+            sx={{
+              borderRadius: "30px",
+              justifyContent: open ? "initial" : "center",
+              padding: "12px 30px 12px 28px",
+              "&:hover": {
+                backgroundColor: item.path && "#2E2F2F",
+              },
+              "&.Mui-selected": {
+                backgroundColor: "#004A77",
+              },
+            }}
+          >
+            {index === 2 && (
+              <IoMdArrowDropdown
+                size={25}
+                className={`text-neutral-300 absolute right-4 ${
+                  !expandedMenu && "rotate-90"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedMenu(!expandedMenu);
+                }}
+              />
+            )}
+            {item.label === "Collections" ? (
+              !open && !mobileOpen ? (
+                <ListItemIcon
+                  sx={{
+                    justifyContent: "center",
+                    color: "#c4c7c5",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+              ) : null
+            ) : (
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 3 : "auto",
+                  justifyContent: "center",
+                  color: "#c4c7c5",
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+            )}
+
+            <ListItemText
+              primary={<div className="font-semibold">{item.label}</div>}
+              sx={{
+                opacity: open || mobileOpen ? 1 : 0,
+                marginLeft: mobileOpen ? "10px" : "0px",
+              }}
+            />
+          </ListItemButton>
+        </ListItem>
+      ))}
+      {expandedMenu && (
+        <div className="hidden sm:block ml-8 sm:ml-12 mt-1 mb-3 transition-all duration-300">
+          {albums.map((album, index) => (
+            <CreateAlbumDialog
+              title={album.get("title", "")}
+              photosIds={album.get("photoIds", List())}
+              createdAt={album.get("createdAt", "")}
+              // handleOpenImage={handleOpenImage}
+              key={index}
+            >
+              {({ handleClickOpen }) => (
+                <div
+                  onClick={handleClickOpen}
+                  className="flex  items-center  px-3 sm:px-4 py-1 sm:py-2 my-1 hover:bg-[#282a2c] rounded-lg cursor-pointer text-neutral-300"
+                >
+                  <img
+                    src={album.get("thumbnail", "")}
+                    className="w-10 h-10 rounded object-cover mr-3"
+                  />
+                  <span className="text-sm sm:text-[17px]  truncate max-w-[120px]">
+                    {album.get("title", "")}
+                  </span>
+                </div>
+              )}
+            </CreateAlbumDialog>
+          ))}
+        </div>
+      )}
+    </Fragment>
   );
 };

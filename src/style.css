@@ -1,5 +1,43 @@
 @import "tailwindcss";
 
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+
+* {
+  /* padding: 0;
+  margin: 0; */
+  box-sizing: border-box;
+  font-family: "Work Sans", "Open Sans", sans-serif;
+}
+@import "tailwindcss";
+@import "swiper/css/bundle";
+@import "swiper/css";
+@import "swiper/css/navigation";
+@import "swiper/css/pagination";
+@import "swiper/css/scrollbar";
+
+:root {
+  --gm3-sys-color-surface: #1f1f1f;
+
+  --gm3-sys-color-background: #131314;
+  --gm3-sys-color-on-surface: #e3e3e3;
+
+  --gm3-sys-color-surface-container: #1e1f20;
+  --gm3-sys-color-on-surface-variant: #c4c7c5;
+
+  --gm3-sys-color-secondary-container: #004a77;
+  --gm3-sys-color-on-secondary-container: #c2e7ff;
+  --gm3-sys-color-surface-container-high: #282a2c;
+
+  --pgc-asset-product-name-logo: url(https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_light_clr_74x24px.svg);
+}
+
+body {
+  height: 100dvh;
+  width: 100dvw;
+  background-color: var(--gm3-sys-color-background);
+  color: var(--gm3-sys-color-on-surface);
+}
+
 .user-input {
   border-radius: 20px;
   background-color: #282a2c;
@@ -11,4 +49,140 @@
     border: none;
     color: white;
   }
+}
+
+header {
+  background-color: var(--gm3-sys-color-surface, rgb(255, 255, 255));
+  display: flex;
+  align-items: center;
+  flex-flow: row nowrap;
+
+  box-sizing: border-box;
+  padding: 0 16px;
+  width: 100%;
+  height: 64px;
+
+  box-shadow: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  width: 240px;
+  padding-left: 16px;
+}
+
+.logo {
+  height: 23px;
+  width: 68px;
+  background-image: var(--pgc-asset-product-name-logo);
+  background-repeat: no-repeat;
+  background-size: 68px 23px;
+  background-position: center;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.header-title {
+  font-family: "Product Sans", Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  line-height: 20px;
+  color: var(--gm3-sys-color-on-surface-variant, rgb(68, 71, 70));
+
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: -3px;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.header-right {
+  height: 48px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.search-bar-container {
+  background: var(--gm3-sys-color-surface-container-high, rgb(233, 238, 246));
+  border-radius: 24px;
+  display: flex;
+  flex: 1 1 50vw;
+  height: 48px;
+  margin: 12px 0;
+  position: relative;
+  white-space: nowrap;
+  align-items: center;
+  justify-content: start;
+}
+
+.search-bar .MuiOutlinedInput-root {
+  height: 100%;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  letter-spacing: 0em;
+  color: var(--gm3-sys-color-on-surface, rgb(31, 31, 31));
+  font-feature-settings: "liga" 0;
+  font-variant-ligatures: no-contextual;
+  background: transparent;
+}
+
+.search-bar .MuiOutlinedInput-root fieldset {
+  border: none;
+}
+
+.search-bar .MuiOutlinedInput-root input::placeholder {
+  color: var(--gm3-sys-color-on-surface, rgb(31, 31, 31));
+  opacity: 0.8;
+}
+
+@media screen and (max-width: 599px) {
+  .logo.head_logo {
+    display: none;
+  }
+
+  .header-title {
+    font-family: "Google Sans", Roboto, Arial, sans-serif;
+    line-height: 1.75rem;
+    font-size: 1.375rem;
+    letter-spacing: 0em;
+    font-weight: 400;
+
+    position: relative;
+    vertical-align: middle;
+    transform: translateZ(0);
+  }
+}
+
+@media (max-width: 1007px) {
+  .header-left {
+    width: auto;
+  }
+  .header-left {
+    padding-left: 0;
+  }
+  .search-bar-container {
+    display: none;
+  }
+}
+
+.embla {
+  overflow: hidden;
+}
+.embla__container {
+  display: flex;
+}
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
 }
