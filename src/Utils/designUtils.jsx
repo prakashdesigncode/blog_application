@@ -78,7 +78,6 @@ const menuIconSX = {
 const addIconSX = {
   width: 40,
   height: 40,
-  marginRight: "7px",
   color: "inherit",
   "&:hover": {
     backgroundColor: "#2C2D2D",

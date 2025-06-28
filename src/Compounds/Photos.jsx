@@ -162,8 +162,11 @@ const Photos = () => {
           <>
             {photos.get("next", List()).size === 0 ? (
               <div className="flex justify-center h-[80vh] items-center w-full flex-col gap-4">
-                <img src="https://www.gstatic.com/social/photosui/images/state/empty_state_photos_646x328dp.svg" />
-                <div className="text-2xl mx-10 text-white">
+                <img
+                  className=" h-auto"
+                  src="https://www.gstatic.com/social/photosui/images/state/empty_state_photos_646x328dp.svg"
+                />
+                <div className="text-1xl sm:text-2xl mx-10 text-white">
                   Ready to add some photos?
                 </div>
               </div>

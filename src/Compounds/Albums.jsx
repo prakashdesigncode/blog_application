@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   selectedAlbums,
   selectedIsLoading,
 } from "../Redux/Dashboard_Redux/selector";
 import { fetchAlbums } from "../Redux/Dashboard_Redux/thunk";
-import {
-  useCallDispatch,
-  useInfiniteScroll,
-  useSelectedValue,
-} from "../Hooks/customHooks";
+import { useInfiniteScroll, useSelectedValue } from "../Hooks/customHooks";
 import SkeletonPhotos from "./SkeletonPhotos";
 
 import { List, Map } from "immutable";
 import { CreateAlbumDialog, ShowSinglePhoto } from "../Utils/designUtils";
 import * as jwtDecode from "jwt-decode";
+import { CircularProgress } from "@mui/material";
 
 const Albums = () => {
   const [infinite, _] = useInfiniteScroll(selectedAlbums, fetchAlbums);
@@ -48,56 +45,70 @@ const Albums = () => {
       {isLoading ? (
         <SkeletonPhotos />
       ) : (
-        infinite.map((value, index) => (
-          <div
-            className="flex flex-col   gap-2  w-86 "
-            // ref={infinite.size - 1 === index ? isInterSecting : null}
-            key={index}
-          >
-            <CreateAlbumDialog
-              title={value.get("title", "")}
-              photosIds={value.get("photoIds", List())}
-              createdAt={value.get("createdAt", "")}
-              handleOpenImage={handleOpenImage}
-            >
-              {({ handleClickOpen }) => {
-                return (
-                  <>
-                    <img
-                      onClick={handleClickOpen}
-                      className={` h-auto w-90 mt-5 object-cover rounded ${
-                        imageLoading.get(index, true) ? "hidden" : "block"
-                      }`}
-                      src={value.get("thumbnail", "")}
-                      onLoad={() =>
-                        setImageLoading((prev) => prev.set(index, false))
-                      }
-                    />
-                    <>
-                      {imageLoading.get(index, true) && (
-                        <div
-                          key={index}
-                          className=" animate-pulse w-93 gap-4 flex justify-center flex-col max-w-sm rounded-md   p-4"
-                        >
-                          <div className="h-55 w-80 rounded bg-neutral-300"></div>
-                        </div>
-                      )}
-                    </>
-                  </>
-                );
-              }}
-            </CreateAlbumDialog>
-
-            <div className="flex flex-col  ">
-              <div className="text-neutral-300  font-bold">
-                {value.get("title", "")}
-              </div>
-              <div className="text-neutral-300 text-[12px]   self-start">
-                {value.get("photoIds", List()).size} items
+        <>
+          {infinite.size <= 0 ? (
+            <div className="flex justify-center h-[80vh] items-center w-full flex-col gap-4">
+              <img
+                className=" h-auto"
+                src="https://www.gstatic.com/social/photosui/images/empty_state_albums_dark.svg"
+              />
+              <div className="text-1xl sm:text-2xl mx-10 text-white">
+                The albums you create are shown here
               </div>
             </div>
-          </div>
-        ))
+          ) : (
+            infinite.map((value, index) => (
+              <div
+                className="flex flex-col   gap-2  w-86 "
+                // ref={infinite.size - 1 === index ? isInterSecting : null}
+                key={index}
+              >
+                <CreateAlbumDialog
+                  title={value.get("title", "")}
+                  photosIds={value.get("photoIds", List())}
+                  createdAt={value.get("createdAt", "")}
+                  handleOpenImage={handleOpenImage}
+                >
+                  {({ handleClickOpen }) => {
+                    return (
+                      <>
+                        <img
+                          onClick={handleClickOpen}
+                          className={` h-auto w-90 mt-5 object-cover rounded ${
+                            imageLoading.get(index, true) ? "hidden" : "block"
+                          }`}
+                          src={value.get("thumbnail", "")}
+                          onLoad={() =>
+                            setImageLoading((prev) => prev.set(index, false))
+                          }
+                        />
+                        <>
+                          {imageLoading.get(index, true) && (
+                            <div
+                              key={index}
+                              className=" animate-pulse w-93 gap-4 flex justify-center flex-col max-w-sm rounded-md   p-4"
+                            >
+                              <div className="h-55 w-80 rounded bg-neutral-300"></div>
+                            </div>
+                          )}
+                        </>
+                      </>
+                    );
+                  }}
+                </CreateAlbumDialog>
+
+                <div className="flex flex-col  ">
+                  <div className="text-neutral-300  font-bold">
+                    {value.get("title", "")}
+                  </div>
+                  <div className="text-neutral-300 text-[12px]   self-start">
+                    {value.get("photoIds", List()).size} items
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </>
       )}
     </div>
   );
